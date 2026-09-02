@@ -91,6 +91,34 @@ corrigidas via o helper `fn_cedula_minha()`. As policies de RLS não
 precisaram de correção: dentro de `using (…)`, NULL já é tratado como
 "não permitido".
 
+## A conta nasce com a cédula
+
+`sql/0004_conta_automatica.sql` — decisão do Germano (2026-09-02): cada
+pessoa e cada empresa já nasce com conta. `id_registar_pessoa` e
+`id_registar_empresa` passam a criar a conta no mesmo passo do registo, e
+devolvem o `iban` na resposta.
+
+- **Empresa (`EP-…`)** → limite de aprovação de **100 000 cêntimos
+  (P$ 1 000,00)**: acima disso a transferência fica pendente até um
+  gerente aprovar.
+- **Pessoa (`PP-…`)** → **sem limite**. Não pode ter: quem decide uma
+  pendente é um gerente *da empresa dona da conta*, e uma conta pessoal
+  não tem gerente — uma pendente ali ficaria presa para sempre.
+
+Duas notas de desenho:
+
+- **`banco_criar_conta_interna`** existe porque `banco_abrir_conta` valida
+  quem está a chamar, e no momento do registo essa validação não serve
+  (a pessoa criada ainda não tem sessão, e a cédula ainda não é de
+  ninguém). A interna não valida chamador e está revogada de `PUBLIC` —
+  só corre de dentro de outra função `SECURITY DEFINER`.
+  `banco_abrir_conta` continua a ser a porta pública, que valida e delega.
+- **Falhar a abrir conta não parte o registo.** A identidade é mais
+  fundamental que a conta: a chamada vai num sub-bloco
+  `begin … exception … end` (em plpgsql isso é uma subtransação), por
+  isso um erro no banco desfaz só essa parte e a pessoa fica registada na
+  mesma — com `aviso_banco` na resposta a dizer o que falhou.
+
 ## Regras de negócio
 
 - **Dinheiro em cêntimos de P$ (`bigint`)**, nunca vírgula flutuante.
