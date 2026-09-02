@@ -1,0 +1,194 @@
+/* Prepacoin (pp-banco) — paleta fixada na skill pp-banco.
+   roxo #8F41DE · laranja #FF7535 · roxo claro #DAC0F4 ·
+   pêssego #FFD6C2 · branco #FFFFFF · grafite #2C2C2C */
+
+:root {
+  --pc-roxo: #8F41DE;
+  --pc-laranja: #FF7535;
+  --pc-roxo-claro: #DAC0F4;
+  --pc-pessego: #FFD6C2;
+  --pc-bg: #FFFFFF;
+  --pc-texto: #2C2C2C;
+  --pc-secundario: #7A7A85;
+  --pc-borda: #E8E4EE;
+  --pc-fundo-suave: #FAF8FC;
+  --pc-ok: #1C7A3A;
+  --pc-erro: #9C1C1C;
+  --pc-aviso: #B4671E;
+}
+
+* { box-sizing: border-box; }
+/* rede de segurança: uma regra de autor pode vencer o [hidden] nativo
+   (aconteceu no subsight com `header nav { display:flex }`) */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--pc-bg);
+  color: var(--pc-texto);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--pc-bg);
+  border-bottom: 1px solid var(--pc-borda);
+}
+.cabecalho-marca { display: flex; align-items: center; gap: 0.7rem; }
+.cabecalho-marca strong { font-size: 1.15rem; letter-spacing: -0.01em; }
+.marca-moeda {
+  width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--pc-roxo), var(--pc-laranja));
+  color: #fff; font-weight: 800; font-size: 1.05rem;
+  display: flex; align-items: center; justify-content: center;
+}
+header nav { display: flex; gap: 1.1rem; align-items: center; }
+header a { color: var(--pc-texto); text-decoration: none; font-size: 0.9rem; }
+header a:hover { color: var(--pc-roxo); }
+
+main { max-width: 860px; margin: 2rem auto; padding: 0 1.25rem 3rem; }
+
+h1 { font-size: 1.45rem; margin: 0 0 1.25rem; }
+h2 { font-size: 1.05rem; margin: 0 0 0.75rem; }
+
+.icone { width: 18px; height: 18px; display: inline-block; vertical-align: -3px; }
+
+/* ---- Cartão da conta: gradiente roxo→laranja pedido na skill ---- */
+.cartao-conta {
+  background: linear-gradient(135deg, var(--pc-roxo) 0%, var(--pc-laranja) 100%);
+  color: #fff;
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 30px rgba(143, 65, 222, 0.28);
+  margin-bottom: 1.75rem;
+}
+.cartao-rotulo {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+  opacity: 0.85; margin: 0 0 0.3rem;
+}
+.cartao-saldo { font-size: 2.3rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.cartao-linha {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;
+}
+.cartao-iban {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.82rem; opacity: 0.95; word-break: break-all;
+}
+.cartao-preso { font-size: 0.78rem; opacity: 0.9; }
+
+.painel {
+  background: var(--pc-bg);
+  border: 1px solid var(--pc-borda);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.topo-pagina {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+}
+
+label { display: block; font-size: 0.85rem; margin: 0.8rem 0 0.25rem; color: #4a4a55; }
+input, select, textarea {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--pc-borda);
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  background: #fff;
+  color: var(--pc-texto);
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--pc-roxo);
+  box-shadow: 0 0 0 3px rgba(143, 65, 222, 0.18);
+}
+
+button, .botao {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-top: 1rem;
+  background: var(--pc-roxo); color: #fff;
+  border: none; padding: 0.62rem 1.2rem; border-radius: 9px;
+  cursor: pointer; font-size: 0.9rem; font-weight: 600;
+  text-decoration: none;
+}
+button:hover, .botao:hover { background: #7a34c2; }
+button:disabled { background: var(--pc-secundario); cursor: not-allowed; }
+button.secundario, .botao.secundario {
+  background: #fff; color: var(--pc-texto); border: 1px solid var(--pc-borda);
+}
+button.secundario:hover { background: var(--pc-fundo-suave); }
+button.laranja { background: var(--pc-laranja); }
+button.laranja:hover { background: #e8632a; }
+button.perigo { background: #fff; color: var(--pc-erro); border: 1px solid #f0c9c9; }
+button.perigo:hover { background: #fdf2f2; }
+
+.msg { margin-top: 0.75rem; font-size: 0.88rem; }
+.msg.erro { color: var(--pc-erro); }
+.msg.sucesso { color: var(--pc-ok); }
+.msg.aviso { color: var(--pc-aviso); }
+
+/* ---- Movimentos ---- */
+.movimento {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--pc-borda);
+}
+.movimento:last-child { border-bottom: none; }
+.mov-categoria { font-weight: 600; font-size: 0.92rem; text-transform: capitalize; }
+.mov-detalhe { font-size: 0.78rem; color: var(--pc-secundario); margin-top: 0.15rem; }
+.mov-valor { font-weight: 700; font-size: 0.98rem; white-space: nowrap; }
+.mov-valor.entrada { color: var(--pc-ok); }
+.mov-valor.saida { color: var(--pc-texto); }
+.mov-valor.anulado { color: var(--pc-secundario); text-decoration: line-through; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.16rem 0.6rem; border-radius: 999px;
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+}
+.badge-concluida { background: #E9F7EF; color: var(--pc-ok); }
+.badge-pendente { background: var(--pc-pessego); color: #A34E12; }
+.badge-rejeitada { background: #F5F5F5; color: #6B7280; }
+.badge-emissao { background: var(--pc-roxo-claro); color: #5B2A90; }
+
+.vazio { color: var(--pc-secundario); font-size: 0.9rem; padding: 1.5rem 0; text-align: center; }
+
+.codigo-auth {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.8rem; color: var(--pc-roxo);
+}
+
+/* ---- Selo do comprovante público ---- */
+.selo {
+  text-align: center; border-radius: 14px; padding: 2.5rem 1.5rem;
+  border-top: 5px solid var(--pc-roxo); background: var(--pc-fundo-suave);
+}
+.selo-ok { border-top-color: var(--pc-ok); }
+.selo-erro { border-top-color: var(--pc-erro); }
+.selo-icone {
+  width: 56px; height: 56px; margin: 0 auto 0.9rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pc-roxo); color: #fff;
+}
+.selo-ok .selo-icone { background: var(--pc-ok); }
+.selo-erro .selo-icone { background: var(--pc-erro); }
+.selo-icone .icone { width: 26px; height: 26px; filter: brightness(0) invert(1); }
+.selo-titulo { font-size: 1.2rem; font-weight: 700; }
+.selo-subtitulo { font-size: 0.88rem; color: var(--pc-secundario); margin-top: 0.3rem; }
+.selo-grade {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  margin-top: 1.5rem; text-align: left;
+}
+.selo-campo .rotulo { font-size: 0.68rem; text-transform: uppercase; color: var(--pc-secundario); }
+.selo-campo .valor { font-size: 0.95rem; margin-top: 0.15rem; }
+
+@media (max-width: 560px) {
+  .cartao-saldo { font-size: 1.8rem; }
+  .selo-grade { grid-template-columns: 1fr; }
+}

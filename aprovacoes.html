@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prepacoin — Aprovações</title>
+  <link rel="stylesheet" href="web/estilos.css" />
+</head>
+<body>
+  <header>
+    <div class="cabecalho-marca">
+      <div class="marca-moeda" aria-hidden="true">P$</div>
+      <strong>Prepacoin</strong>
+    </div>
+    <nav>
+      <a href="index.html">← A minha conta</a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="area-login" class="painel" style="max-width:360px">
+      <h2>Entrar</h2>
+      <form id="form-login">
+        <label for="email">Email de login</label>
+        <input id="email" type="email" required />
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" required />
+        <button type="submit">Entrar</button>
+        <p class="msg" id="msg-login"></p>
+      </form>
+    </div>
+
+    <div id="area-aprovacoes" hidden>
+      <h1>Transferências à espera de aprovação</h1>
+      <p class="msg" style="color:#7A7A85; margin-bottom:1.25rem">
+        Só um gerente da empresa dona da conta de origem pode decidir.
+      </p>
+
+      <div class="painel">
+        <div id="lista-pendentes"><p class="vazio">A carregar…</p></div>
+      </div>
+
+      <p class="msg" id="msg-aprovacoes"></p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
+  <script src="web/comum-banco.js"></script>
+  <script src="aprovacoes.js"></script>
+</body>
+</html>

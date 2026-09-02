@@ -2,11 +2,13 @@
 
 Banco **Prepacoin** — contas, IBAN PT50, transferências em P$ (Prepara Portugal)
 
-**Status:** backend construído e testado de ponta a ponta com sessões reais
-(abertura de conta, emissão de fundo, transferência, limite→aprovação,
-incumprimento, extrato, comprovante público). Frontend por construir.
+**Status:** backend e frontend construídos e testados de ponta a ponta com
+sessões reais (abertura de conta, emissão de fundo, transferência,
+limite→aprovação, incumprimento, extrato, comprovante público).
 **Depende de:** [pp-base](https://github.com/projetoempresaficticia/pp-base),
 [classcard](https://github.com/projetoempresaficticia/classcard) (pp-identidade)
+
+Site: https://projetoempresaficticia.github.io/pp-banco/
 
 Documentação completa (PRDs e decisões) em
 [prepara-portugal-docs](https://github.com/projetoempresaficticia/prepara-portugal-docs).
@@ -117,12 +119,45 @@ venda sem saldo (recusa **sem** falir), salário sem saldo (recusa **e**
 marca incumprimento), extrato com o rasto das rejeitadas, e comprovante
 público sem login a devolver só os últimos 4 dígitos dos IBANs.
 
-Dados de teste do banco (contas e transações) limpos no fim.
+O frontend foi testado depois, também com login real: abrir conta pela UI
+(pessoal e da empresa), cartão a mostrar saldo/IBAN, seletor entre as duas
+contas, transferência de P$ 1250,50 que caiu em pendente por passar o
+limite de P$ 1000,00, aprovação pela fila, e o extrato a fechar a
+matemática (P$ 4000,00 de emissão − P$ 1250,50 = P$ 2749,50). O
+comprovante foi verificado **com a sessão terminada**, provando que a
+página pública funciona sem login.
 
-## Por construir
+Dados de teste do banco (contas e transações) limpos no fim. Ficaram na
+Carteirinha uma empresa e uma pessoa de teste (`EP-2026-00002` "Padaria
+Teste Prepacoin" e `PP-2026-00005` "Gerente Teste") — úteis como fixture,
+mas é só dizer que se apagam.
 
-- Frontend: dashboard com cartão em gradiente roxo→laranja (saldo, IBAN,
-  movimentos), transferir, fila de aprovações, comprovante e página
-  pública de verificação. Saldo em tempo real via Supabase Realtime.
+## Frontend
+
+- `index.html`/`app.js` — cartão da conta em **gradiente roxo→laranja**
+  (saldo disponível, IBAN, e quanto está preso em pendentes), movimentos
+  com badge de estado e código do comprovante, e um seletor entre a conta
+  pessoal e a da empresa para quem tem as duas. Quem ainda não tem conta
+  vê um painel para a abrir. Saldo em tempo real via Supabase Realtime.
+- `transferir.html`/`transferir.js` — escolher de qual conta sai (mostrando
+  disponível, preso em pendentes e o limite de aprovação), IBAN de destino,
+  valor em P$ e categoria. O valor é convertido para cêntimos no cliente;
+  o servidor volta a validar tudo.
+- `aprovacoes.html`/`aprovacoes.js` — fila das transferências pendentes com
+  aprovar/rejeitar.
+- `comprovante.html`/`comprovante.js` — verificação pública, sem login,
+  por código de autenticação (aceita `?codigo=…` na URL).
+- `web/estilos.css` + `web/comum-banco.js` — paleta e utilitários
+  (formatação de P$, IBAN e datas). O cliente Supabase vem do `comum.js`
+  da pp-base, carregado cross-repo.
+- Ícones reaproveitados do cache local da skill `figma-icons` — nenhuma
+  chamada nova ao Figma (a cota do plano Starter é mensal).
+
+## Por fazer
+
+- Comprovante em PDF (hoje a verificação é a página pública; a skill também
+  pede um PDF descarregável).
 - Rever `fn_gerar_iban` no advisory de segurança (chamável por
   `anon`/`authenticated`, como as outras RPCs da porta única).
+- Quando o `pp-criar-empresa` existir, passar a injetar o fundo inicial por
+  `banco_creditar_inicial` em vez de escrever direto em `contas`.

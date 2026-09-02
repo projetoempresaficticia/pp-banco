@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prepacoin — Comprovante</title>
+  <link rel="stylesheet" href="web/estilos.css" />
+</head>
+<body>
+  <header>
+    <div class="cabecalho-marca">
+      <div class="marca-moeda" aria-hidden="true">P$</div>
+      <strong>Prepacoin</strong>
+    </div>
+    <nav>
+      <a href="index.html">A minha conta</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Verificar comprovante</h1>
+    <p class="msg" style="color:#7A7A85; margin-bottom:1.25rem">
+      Qualquer pessoa pode conferir um comprovante aqui, sem entrar na conta.
+      Só se mostram os últimos 4 dígitos de cada IBAN.
+    </p>
+
+    <form id="form-verificar" class="painel" style="max-width:420px">
+      <label for="codigo">Código de autenticação</label>
+      <input id="codigo" placeholder="12 caracteres" required />
+      <button type="submit">
+        <img class="icone" src="web/icons/shield-check.svg" alt="" style="filter:brightness(0) invert(1)" />
+        Verificar
+      </button>
+      <p class="msg" id="msg-verificar"></p>
+    </form>
+
+    <div id="resultado" class="selo" hidden>
+      <div class="selo-icone"><img class="icone" src="web/icons/shield-check.svg" alt="" /></div>
+      <div class="selo-titulo" id="v-titulo">—</div>
+      <div class="selo-subtitulo" id="v-subtitulo">—</div>
+      <div class="selo-grade">
+        <div class="selo-campo"><div class="rotulo">Valor</div><div class="valor" id="v-valor">—</div></div>
+        <div class="selo-campo"><div class="rotulo">Categoria</div><div class="valor" id="v-categoria">—</div></div>
+        <div class="selo-campo"><div class="rotulo">Data</div><div class="valor" id="v-data">—</div></div>
+        <div class="selo-campo"><div class="rotulo">Contas</div><div class="valor" id="v-contas">—</div></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
+  <script src="web/comum-banco.js"></script>
+  <script src="comprovante.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prepacoin</title>
+  <link rel="stylesheet" href="web/estilos.css" />
+</head>
+<body>
+  <header>
+    <div class="cabecalho-marca">
+      <div class="marca-moeda" aria-hidden="true">P$</div>
+      <strong>Prepacoin</strong>
+    </div>
+    <nav id="nav-logado" hidden>
+      <a href="transferir.html">Transferir</a>
+      <a href="aprovacoes.html">Aprovações</a>
+      <a href="comprovante.html">Comprovante</a>
+      <button type="button" class="secundario" id="btn-sair" style="margin:0">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="area-login" class="painel" style="max-width:360px">
+      <h2>Entrar</h2>
+      <form id="form-login">
+        <label for="email">Email de login</label>
+        <input id="email" type="email" required />
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" required />
+        <button type="submit">Entrar</button>
+        <p class="msg" id="msg-login"></p>
+      </form>
+    </div>
+
+    <div id="area-conta" hidden>
+      <div class="topo-pagina">
+        <h1 id="titulo-conta">A minha conta</h1>
+        <select id="seletor-conta" style="width:auto; min-width:220px" hidden></select>
+      </div>
+
+      <div class="cartao-conta">
+        <p class="cartao-rotulo">Saldo disponível</p>
+        <div class="cartao-saldo" id="c-saldo">—</div>
+        <div class="cartao-linha">
+          <div>
+            <p class="cartao-rotulo">IBAN</p>
+            <div class="cartao-iban" id="c-iban">—</div>
+          </div>
+          <div class="cartao-preso" id="c-preso"></div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="topo-pagina" style="margin-bottom:0.5rem">
+          <h2 style="margin:0">Movimentos</h2>
+          <a href="transferir.html" class="botao" style="margin:0">Nova transferência</a>
+        </div>
+        <div id="lista-movimentos">
+          <p class="vazio">A carregar…</p>
+        </div>
+      </div>
+
+      <p class="msg" id="msg-conta"></p>
+    </div>
+
+    <div id="area-sem-conta" class="painel" hidden>
+      <h2>Ainda não tem conta</h2>
+      <p style="font-size:0.92rem; color:#7A7A85">
+        A sua cédula ainda não tem conta no Prepacoin. Abra a conta para começar
+        a receber e enviar P$.
+      </p>
+      <button type="button" id="btn-abrir-conta">Abrir a minha conta</button>
+      <p class="msg" id="msg-abrir"></p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
+  <script src="web/comum-banco.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
