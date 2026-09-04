@@ -4,11 +4,9 @@
 // manda é o servidor, que volta a somar a partir das linhas. Se os dois
 // discordarem, é o do servidor que vale.
 
-const areaLogin = document.getElementById('area-login');
 const areaEmitir = document.getElementById('area-emitir');
 const areaResultado = document.getElementById('area-resultado');
 const areaSemEmpresa = document.getElementById('area-sem-empresa');
-const navLogado = document.getElementById('nav-logado');
 const itens = document.getElementById('itens');
 
 function esc(s) {
@@ -161,8 +159,7 @@ async function verificarSessao() {
 
   const { data } = await sb.auth.getSession();
   if (!data.session) return;
-  areaLogin.hidden = true;
-  navLogado.hidden = false;
+  pcMostrarApp('Emitir fatura');
 
   const minha = await minhaEmpresaCedula();
   if (!minha) {
@@ -176,22 +173,5 @@ async function verificarSessao() {
   await carregarDevedores(minha);
 }
 
-document.getElementById('form-login').addEventListener('submit', async (ev) => {
-  ev.preventDefault();
-  const { error } = await sb.auth.signInWithPassword({
-    email: document.getElementById('email').value,
-    password: document.getElementById('senha').value,
-  });
-  if (error) {
-    mostrarMsg(document.getElementById('msg-login'), 'Login inválido.', 'erro');
-    return;
-  }
-  await verificarSessao();
-});
-
-document.getElementById('btn-sair').addEventListener('click', async () => {
-  await sb.auth.signOut();
-  window.location.reload();
-});
-
+pcLigarEntrada(verificarSessao);
 verificarSessao();

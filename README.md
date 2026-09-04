@@ -4,7 +4,9 @@ Banco **Prepacoin** — contas, IBAN PT50, transferências em P$ (Prepara Portug
 
 **Status:** backend e frontend construídos e testados de ponta a ponta com
 sessões reais (abertura de conta, emissão de fundo, transferência,
-limite→aprovação, incumprimento, extrato, comprovante público).
+limite→aprovação, incumprimento, extrato, comprovante público, fatura com
+linhas, boleto por entidade+referência e cancelamento). Frontend
+redesenhado sobre a biblioteca própria em 2026-09-04.
 **Depende de:** [pp-base](https://github.com/projetoempresaficticia/pp-base),
 [classcard](https://github.com/projetoempresaficticia/classcard) (pp-identidade)
 
@@ -13,13 +15,57 @@ Site: https://projetoempresaficticia.github.io/pp-banco/
 Documentação completa (PRDs e decisões) em
 [prepara-portugal-docs](https://github.com/projetoempresaficticia/prepara-portugal-docs).
 
-## Identidade visual (já fixada na skill)
+## Identidade visual
+
+**Mudou em 2026-09-04** (decisão do Germano). O Prepacoin adotou por
+inteiro o kit **Nexus Bank**; a paleta Purse violeta/laranja que aqui
+esteve (`#8F41DE`, `#FF7535`) já não é a do banco.
 
 - Nome do produto: **Prepacoin**
-- Roxo (marca) `#8F41DE` · Laranja `#FF7535` · Roxo claro `#DAC0F4` ·
-  Pêssego claro `#FFD6C2` · Branco `#FFFFFF` · Grafite `#2C2C2C`
-- Cartão do dashboard em **gradiente roxo→laranja**; propositalmente
-  distinta do azul institucional do ClassCard.
+- Lima `#EBFF78` · Tinta `#0A0C10` · Neutro claro `#667085` · Neutro
+  escuro `#98A2B3` · Linha `#DADADA`
+- **Inter** (400/500/600) no texto, **Sora** (600/700) no display e no
+  dinheiro
+- Tema claro por omissão, escuro quando o sistema o pede, e a escolha
+  explícita do utilizador vence as duas
+
+A biblioteca está em `web/biblioteca/prepacoin.css` e a montra em
+[biblioteca.html](https://projetoempresaficticia.github.io/pp-banco/biblioteca.html).
+
+### A regra que decide o resto
+
+O lima tem **1,10:1** de contraste sobre branco. Não é gosto, é medição:
+no tema claro **desaparece** como texto. Só pode ser preenchimento, e
+sempre com a tinta por cima, onde dá 17,81:1.
+
+Daí a lei que atravessa a biblioteca inteira:
+
+| | quem carrega a ênfase | o que o lima faz |
+|---|---|---|
+| tema claro | a tinta `#0A0C10` | preenche, com tinta por cima |
+| tema escuro | o lima `#EBFF78` | preenche **e** escreve |
+
+É o mesmo `#0A0C10` a trocar de papel entre tinta e chão. Foi assim que o
+kit original o desenhou, e é por isso que funciona.
+
+Cores do kit que **reprovam** no tema claro e por isso ficam reservadas ao
+escuro: `#98A2B3` (2,58:1), `#34C759` (2,22:1), `#C7E046` (1,48:1). Para o
+claro há substitutas medidas: `#1A7F37` (5,08:1), `#B42318` (6,57:1),
+`#B54708` (5,43:1).
+
+### Duas armadilhas que esta biblioteca já resolveu
+
+**A série dos gráficos existe por um bug.** No tema claro `--pc-enfase` e
+`--pc-texto` são a **mesma cor**, e o primeiro gráfico de categorias saiu
+com "Salários" e "Impostos" indistinguíveis. Daí `--pc-s1` a `--pc-s5`,
+cada uma medida contra o painel do seu tema. O que as separa entre si é o
+matiz, não a luminância, e por isso a legenda leva sempre texto e
+percentagem: a cor nunca conta a história sozinha.
+
+**O `url()` dos ícones está declarado no CSS, nunca no HTML.** Um `url()`
+dentro de uma custom property resolve-se relativo à folha onde foi
+declarado. Declará-lo no HTML partia todos os caminhos, que foi o bug que
+apagou os ícones do Cartório.
 
 ## O estado em que a base foi encontrada
 
@@ -287,11 +333,22 @@ mas é só dizer que se apagam.
 
 ## Frontend
 
-- `index.html`/`app.js` — cartão da conta em **gradiente roxo→laranja**
-  (saldo disponível, IBAN, e quanto está preso em pendentes), movimentos
-  com badge de estado e código do comprovante, e um seletor entre a conta
-  pessoal e a da empresa para quem tem as duas. Quem ainda não tem conta
-  vê um painel para a abrir. Saldo em tempo real via Supabase Realtime.
+Todas as páginas partilham o mesmo esqueleto: rail de ícones à esquerda,
+barra de topo com quem está com a sessão aberta, e o mesmo ecrã de entrada
+(quem chega a `boletos.html` sem sessão entra ali e **fica ali**, em vez de
+ser atirado para o index). O rail e a barra são montados por
+`web/parcial.js`, não copiados página a página.
+
+- `index.html`/`app.js` — painel da conta: cartão com saldo disponível e
+  IBAN, seletor entre a conta pessoal e a da empresa, e quatro leituras
+  **todas derivadas do mesmo extrato que a lista já usava**: para onde vai
+  o dinheiro (barra por categoria), entradas contra saídas, movimento por
+  dia da semana, e o que está por pagar. Nada aqui é inventado nem
+  arredondado para ficar bonito: se um gráfico e a lista discordarem, um
+  dos dois tem um bug, e é isso que se quer. Números falsos num app que
+  ensina contabilidade seriam a pior lição possível. Só contam as
+  transferências **concluídas**: uma recusada não gastou nada. Saldo em
+  tempo real via Supabase Realtime.
 - `transferir.html`/`transferir.js` — escolher de qual conta sai (mostrando
   disponível, preso em pendentes e o limite de aprovação), IBAN de destino,
   valor em P$ e categoria. O valor é convertido para cêntimos no cliente;
@@ -309,35 +366,53 @@ mas é só dizer que se apagam.
   "Emitidos por mim", e cancelar para quem emitiu.
 - `documento.html`/`documento.js` — a folha A4 do boleto e do
   comprovativo, para imprimir ou guardar em PDF.
-- `web/estilos.css` + `web/comum-banco.js` — paleta e utilitários
-  (formatação de P$, IBAN e datas). O cliente Supabase vem do `comum.js`
-  da pp-base, carregado cross-repo.
-- Ícones reaproveitados do cache local da skill `figma-icons` — nenhuma
-  chamada nova ao Figma (a cota do plano Starter é mensal).
+- `biblioteca.html` — a montra da biblioteca: a regra do contraste com a
+  prova lado a lado, cores, tipografia, ícones, botões, formulários,
+  estados, gráficos e raios. É por aqui que se começa antes de desenhar
+  um ecrã novo.
+- `web/biblioteca/prepacoin.css` — a biblioteca. Tokens dos dois temas,
+  esqueleto, componentes, gráficos e a folha A4.
+- `web/parcial.js` — rail, barra de topo, ecrã de entrada e quem está com
+  a sessão aberta. Existiam copiados em cada página, e por isso tinham
+  ficado diferentes uns dos outros.
+- `web/tema.js` — o alternador. Três estados, não dois: sistema (por
+  omissão), claro e escuro. Só a escolha explícita escreve `data-tema` na
+  raiz.
+- `web/comum-banco.js` — formatação de P$, IBAN e datas, e os badges de
+  estado. O cliente Supabase vem do `comum.js` da pp-base, cross-repo.
+- `web/icones/` — 22 ícones **Vuesax**, exportados do kit Nexus pela API
+  REST do Figma numa só chamada. Pintados por `mask-image`, seguem o
+  `currentColor` e trocam de tema sozinhos.
 
-## Cache dos ficheiros locais
-
-Cada `<script>`/`<link>` local leva `?v=<sha1 dos 8 primeiros dígitos>` do
-próprio ficheiro. Não é gosto: durante os testes o browser serviu uma
-cópia velha do `comum-banco.js` e o comprovativo ficou preso em
-"A carregar…" com um `formatarDataHora is not defined` que não aparecia em
-lado nenhum. **Ao alterar um ficheiro local é preciso atualizar o `?v=`
-nos HTML que o carregam**, senão volta o mesmo. Para conferir tudo de uma
-vez:
+## Ferramentas
 
 ```sh
-for html in *.html; do
-  grep -oE '(src|href)="([^"?]+)\?v=([0-9a-f]{8})"' "$html" | while read -r ref; do
-    f=$(echo "$ref" | sed -E 's/.*="([^"?]+)\?v=.*/\1/')
-    v=$(echo "$ref" | sed -E 's/.*\?v=([0-9a-f]{8})".*/\1/')
-    r=$(sha1sum "$f" | cut -c1-8)
-    [ "$v" != "$r" ] && echo "DESATUALIZADO $html -> $f ($v ≠ $r)"
-  done
-done
+python ferramentas/versoes.py            # carimba os ?v= com o sha1 real
+python ferramentas/versoes.py --conferir # só verifica, devolve 1 se falhar
+python ferramentas/gerar_paginas.py      # regera as 4 páginas do molde
 ```
+
+**Ao alterar um ficheiro local, correr `versoes.py`.** Cada
+`<script>`/`<link>` local leva `?v=<sha1>` do próprio ficheiro, e não é
+gosto: durante os testes o browser serviu uma cópia velha do
+`comum-banco.js` e o comprovativo ficou preso em "A carregar…" com um
+`formatarDataHora is not defined` que não aparecia em lado nenhum. Fazer
+isto à mão em 8 páginas por 5 ficheiros falha, e por isso é um script.
+
+O `gerar_paginas.py` escreve `transferir`, `boletos`, `emitir` e
+`aprovacoes` a partir de um molde comum. O `index` e a `biblioteca` ficam
+de fora: o primeiro tem um painel de conta que não se parece com nenhum
+outro, a segunda é a montra. O molde existe porque o rail e a barra de
+topo, escritos à mão em cada página, tinham ficado diferentes uns dos
+outros, com navegações que não batiam certo.
 
 ## Por fazer
 
+- **Confirmar o desenho num telemóvel a sério.** As regras de telemóvel
+  existem (abaixo de 720px o rail passa a barra inferior, com
+  `env(safe-area-inset-bottom)`), e nenhuma página transborda na
+  horizontal, mas o `agent-browser` desta máquina não controla o viewport
+  e por isso o ecrã pequeno **não foi visto**, só lido no CSS.
 - **Limpar a fuga de `sqlerrm`** nas ~25 funções que ainda devolvem o erro
   cru do Postgres ao browser (ver secção acima). É uma passagem
   mecânica mas atravessa todos os repos.

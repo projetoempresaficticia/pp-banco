@@ -39,13 +39,24 @@ function formatarData(iso) {
   });
 }
 
+// Cada estado leva ícone E palavra, nunca só a cor: quem não distingue
+// verde de vermelho tem de continuar a perceber o que se passou.
+const PC_ESTADOS = {
+  concluida:    { rotulo: 'Concluída',   icone: 'i-aprovado' },
+  pendente:     { rotulo: 'Pendente',    icone: 'i-info' },
+  rejeitada:    { rotulo: 'Rejeitada',   icone: 'i-info' },
+  pago:         { rotulo: 'Pago',        icone: 'i-aprovado' },
+  paga:         { rotulo: 'Paga',        icone: 'i-aprovado' },
+  por_pagar:    { rotulo: 'Por pagar',   icone: 'i-info' },
+  em_pagamento: { rotulo: 'À espera de aprovação', icone: 'i-info' },
+  cancelado:    { rotulo: 'Cancelado',   icone: 'i-info' },
+  anulada:      { rotulo: 'Anulada',     icone: 'i-info' },
+};
+
 function badgeEstado(estado) {
-  const rotulos = {
-    concluida: 'Concluída',
-    pendente: 'Pendente',
-    rejeitada: 'Rejeitada',
-  };
-  return `<span class="badge badge-${estado}">${rotulos[estado] || estado}</span>`;
+  const e = PC_ESTADOS[estado] || { rotulo: estado, icone: 'i-info' };
+  return `<span class="badge badge-${estado}">`
+       + `<span class="icone ${e.icone}"></span>${e.rotulo}</span>`;
 }
 
 function mostrarMsg(el, texto, tipo) {

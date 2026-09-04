@@ -1,0 +1,993 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PREPACOIN — biblioteca de design
+   Banco do ecossistema Prepara Portugal.
+
+   Identidade adotada do kit Nexus Bank (decisão do Germano, 2026-09-04),
+   substituindo a paleta Purse violeta/laranja que aqui esteve antes.
+
+   A LEI DESTA BIBLIOTECA, e vale a pena perceber porquê:
+
+     O lima #EBFF78 tem 1,10:1 de contraste sobre branco. Não é opinião,
+     é medição. Isso quer dizer que no tema claro o lima NUNCA pode ser
+     texto, nem traço, nem borda fina: desaparece. Só pode ser
+     PREENCHIMENTO, e sempre com a tinta #0A0C10 por cima (17,81:1).
+
+     No tema escuro o lima sobre a tinta dá os mesmos 17,81:1, e aí já
+     pode ser tudo: texto, traço de gráfico, ênfase.
+
+     Daí a regra que atravessa o ficheiro inteiro:
+       tema claro  → a TINTA carrega a ênfase, o lima preenche
+       tema escuro → o LIMA carrega a ênfase, a tinta é o chão
+
+     É o mesmo #0A0C10 a trocar de papel entre tinta e fundo. Foi assim
+     que o kit original o desenhou, e é por isso que funciona.
+
+   Contraste de tudo o que aqui está, medido em WCAG 2.1:
+     tinta / branco .......... 19,57:1
+     tinta / lima ............ 17,81:1
+     lima / tinta ............ 17,81:1
+     #667085 / branco ......... 4,97:1   (texto secundário, tema claro)
+     #98A2B3 / tinta .......... 7,60:1   (texto secundário, tema escuro)
+     #1A7F37 / branco ......... 5,08:1   #34C759 / tinta ..... 8,82:1
+     #B42318 / branco ......... 6,57:1   #FF7A70 / tinta ..... 7,71:1
+     #B54708 / branco ......... 5,43:1   #FDB022 / tinta .... 10,63:1
+
+   Cores que o kit usa mas que aqui NÃO passam e por isso não entram no
+   tema claro: #98A2B3 (2,58:1), #34C759 (2,22:1), #C7E046 (1,48:1).
+   Ficam reservadas ao tema escuro, onde passam com folga.
+
+   Sistema de raios, uma regra só, seguida em todo o lado:
+     4px  marcas e traços        12px  botões, campos, chips
+     16px painéis e cartões      999px pílulas e avatares
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* As fontes carregam-se no <head> de cada página, não com @import aqui:
+   um @import encadeia os pedidos em série (HTML → CSS → CSS da fonte →
+   ficheiro da fonte) e atrasa o primeiro desenho. Cada página leva:
+
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?
+       family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap">
+
+   Se as fontes não carregarem, a pilha de reserva abaixo aguenta a
+   página de pé: muda a forma das letras, não parte o desenho. */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. TOKENS
+   ─────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* a marca: constante nos dois temas, é o que torna isto Prepacoin */
+  --pc-lima: #EBFF78;
+  --pc-lima-fundo: #C7E046;   /* só para :hover de superfície lima */
+  --pc-tinta: #0A0C10;
+
+  /* ---- tema claro (por omissão) ---- */
+  --pc-chao: #FFFFFF;
+  --pc-chao-suave: #F9FAFB;
+  --pc-superficie: #FFFFFF;
+  --pc-superficie-alta: #FCFCFD;
+
+  --pc-texto: #0A0C10;
+  --pc-texto-suave: #667085;
+
+  --pc-linha: #DADADA;
+  --pc-linha-suave: #F1F1F1;
+
+  /* quem carrega a ênfase neste tema */
+  --pc-enfase: #0A0C10;
+  --pc-sobre-enfase: #FFFFFF;
+
+  /* o lima é preenchimento, e leva sempre tinta por cima */
+  --pc-destaque: #EBFF78;
+  --pc-sobre-destaque: #0A0C10;
+
+  --pc-ok: #1A7F37;
+  --pc-ok-fundo: #E7F5EC;
+  --pc-erro: #B42318;
+  --pc-erro-fundo: #FDECEA;
+  --pc-aviso: #B54708;
+  --pc-aviso-fundo: #FDF3E7;
+
+  /* série categórica dos gráficos.
+     Existe porque `--pc-enfase` e `--pc-texto` são a MESMA cor no tema
+     claro: usar os dois num gráfico desenhava duas categorias iguais.
+     Cada uma destas passa 3:1 contra o painel do seu tema. O que as
+     separa entre si é o matiz, não a luminância, e por isso a legenda
+     leva sempre texto e percentagem: a cor nunca conta a história
+     sozinha. */
+  --pc-s1: #0A0C10;
+  --pc-s2: #1A7F37;
+  --pc-s3: #B54708;
+  --pc-s4: #3538CD;
+  --pc-s5: #667085;
+
+  --pc-sombra: 0 1px 2px rgba(10, 12, 16, .04), 0 8px 24px rgba(10, 12, 16, .06);
+  --pc-sombra-alta: 0 2px 4px rgba(10, 12, 16, .05), 0 16px 40px rgba(10, 12, 16, .10);
+
+  /* raios: um sistema só */
+  --pc-r-marca: 4px;
+  --pc-r-controlo: 12px;
+  --pc-r-painel: 16px;
+  --pc-r-pilula: 999px;
+
+  /* espaçamento, densidade de dashboard */
+  --pc-e1: 4px;   --pc-e2: 8px;   --pc-e3: 12px;  --pc-e4: 16px;
+  --pc-e5: 24px;  --pc-e6: 32px;  --pc-e7: 48px;  --pc-e8: 64px;
+
+  --pc-rail: 72px;
+  --pc-largura: 1200px;
+
+  --pc-t-rapida: 120ms cubic-bezier(.16, 1, .3, 1);
+  --pc-t-normal: 200ms cubic-bezier(.16, 1, .3, 1);
+
+  color-scheme: light;
+}
+
+/* ---- tema escuro: só os tokens que mudam ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --pc-chao: #0A0C10;
+    --pc-chao-suave: #060A11;
+    --pc-superficie: #12151C;
+    --pc-superficie-alta: #171B24;
+
+    --pc-texto: #FFFFFF;
+    --pc-texto-suave: #98A2B3;
+
+    --pc-linha: #232833;
+    --pc-linha-suave: #1A1E27;
+
+    /* aqui é o lima que carrega a ênfase */
+    --pc-enfase: #EBFF78;
+    --pc-sobre-enfase: #0A0C10;
+
+    --pc-destaque: #EBFF78;
+    --pc-sobre-destaque: #0A0C10;
+
+    --pc-ok: #34C759;
+    --pc-ok-fundo: #10281A;
+    --pc-erro: #FF7A70;
+    --pc-erro-fundo: #2A1513;
+    --pc-aviso: #FDB022;
+    --pc-aviso-fundo: #2A1E0C;
+
+    --pc-s1: #EBFF78;
+    --pc-s2: #34C759;
+    --pc-s3: #FDB022;
+    --pc-s4: #8098F9;
+    --pc-s5: #98A2B3;
+
+    --pc-sombra: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .4);
+    --pc-sombra-alta: 0 2px 4px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .5);
+
+    color-scheme: dark;
+  }
+}
+
+/* ---- escolha explícita do utilizador, vence a do sistema ---- */
+:root[data-tema="escuro"] {
+  --pc-chao: #0A0C10;
+  --pc-chao-suave: #060A11;
+  --pc-superficie: #12151C;
+  --pc-superficie-alta: #171B24;
+  --pc-texto: #FFFFFF;
+  --pc-texto-suave: #98A2B3;
+  --pc-linha: #232833;
+  --pc-linha-suave: #1A1E27;
+  --pc-enfase: #EBFF78;
+  --pc-sobre-enfase: #0A0C10;
+  --pc-destaque: #EBFF78;
+  --pc-sobre-destaque: #0A0C10;
+  --pc-ok: #34C759;
+  --pc-ok-fundo: #10281A;
+  --pc-erro: #FF7A70;
+  --pc-erro-fundo: #2A1513;
+  --pc-aviso: #FDB022;
+  --pc-aviso-fundo: #2A1E0C;
+  --pc-s1: #EBFF78;
+  --pc-s2: #34C759;
+  --pc-s3: #FDB022;
+  --pc-s4: #8098F9;
+  --pc-s5: #98A2B3;
+  --pc-sombra: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .4);
+  --pc-sombra-alta: 0 2px 4px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   2. BASE
+   ─────────────────────────────────────────────────────────────────── */
+
+* { box-sizing: border-box; }
+
+/* rede de segurança: uma regra de autor pode vencer o [hidden] nativo,
+   como aconteceu no subsight com `header nav { display:flex }` */
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--pc-chao-suave);
+  color: var(--pc-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* o foco tem de ser visível e ter 3:1 de contraste com o que está
+   à volta; `currentColor` garante isso nos dois temas de uma vez */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: var(--pc-r-marca);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   3. TIPOGRAFIA
+   Sora carrega o display e os números grandes, Inter carrega o resto.
+   Os números usam tabular-nums para as colunas de dinheiro alinharem.
+   ─────────────────────────────────────────────────────────────────── */
+
+h1, h2, h3, .display {
+  font-family: 'Sora', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+h1 { font-size: 28px; font-weight: 700; line-height: 1.2; }
+h2 { font-size: 18px; font-weight: 600; line-height: 1.3; }
+h3 { font-size: 15px; font-weight: 600; line-height: 1.4; }
+
+p { margin: 0 0 var(--pc-e3); }
+
+.rotulo-secao {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pc-texto-suave);
+  margin: 0 0 var(--pc-e2);
+}
+
+.numero {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.mono, .codigo-auth, .linha-mb, .doc-id {
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.codigo-auth {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  background: var(--pc-chao-suave);
+  border: 1px solid var(--pc-linha);
+  border-radius: var(--pc-r-marca);
+  padding: 2px 6px;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   4. ESQUELETO: rail de ícones à esquerda, conteúdo à direita
+   ─────────────────────────────────────────────────────────────────── */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--pc-rail) minmax(0, 1fr);
+  min-height: 100svh;
+}
+
+.rail {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pc-e2);
+  padding: var(--pc-e4) 0;
+  background: var(--pc-tinta);
+  color: #FFFFFF;
+}
+
+.rail-marca {
+  width: 40px; height: 40px;
+  border-radius: var(--pc-r-controlo);
+  background: var(--pc-lima);
+  color: var(--pc-tinta);
+  display: grid; place-items: center;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700; font-size: 15px;
+  margin-bottom: var(--pc-e4);
+  flex-shrink: 0;
+}
+
+.rail a {
+  width: 44px; height: 44px;          /* alvo de toque mínimo */
+  border-radius: var(--pc-r-controlo);
+  display: grid; place-items: center;
+  color: rgba(255, 255, 255, .55);
+  text-decoration: none;
+  transition: background var(--pc-t-rapida), color var(--pc-t-rapida);
+}
+.rail a:hover { background: rgba(255, 255, 255, .08); color: #FFFFFF; }
+.rail a[aria-current="page"] { background: var(--pc-lima); color: var(--pc-tinta); }
+.rail .empurra { margin-top: auto; }
+
+.painel-principal { min-width: 0; display: flex; flex-direction: column; }
+
+.barra-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pc-e4);
+  padding: var(--pc-e4) var(--pc-e6);
+  background: var(--pc-chao);
+  border-bottom: 1px solid var(--pc-linha);
+}
+.barra-topo .marca {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700; font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.barra-topo nav { display: flex; align-items: center; gap: var(--pc-e1); }
+.barra-topo nav a {
+  color: var(--pc-texto-suave);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--pc-e2) var(--pc-e3);
+  border-radius: var(--pc-r-controlo);
+  transition: color var(--pc-t-rapida), background var(--pc-t-rapida);
+}
+.barra-topo nav a:hover { color: var(--pc-texto); background: var(--pc-chao-suave); }
+.barra-topo nav a[aria-current="page"] { color: var(--pc-texto); font-weight: 600; }
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--pc-largura);
+  margin: 0 auto;
+  padding: var(--pc-e6);
+}
+
+.topo-pagina {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--pc-e4); flex-wrap: wrap;
+  margin-bottom: var(--pc-e5);
+}
+
+/* grelhas de dashboard */
+.grade { display: grid; gap: var(--pc-e4); }
+.grade-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grade-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grade-conta { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+
+@media (max-width: 980px) {
+  .grade-2, .grade-3, .grade-conta { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 720px) {
+  :root { --pc-rail: 0px; }
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail {
+    position: fixed; bottom: 0; top: auto; left: 0; right: 0;
+    height: auto; width: 100%;
+    flex-direction: row; justify-content: space-around;
+    padding: var(--pc-e2) var(--pc-e3);
+    z-index: 20;
+    padding-bottom: max(var(--pc-e2), env(safe-area-inset-bottom));
+  }
+  .rail-marca, .rail .empurra { display: none; }
+  main { padding: var(--pc-e4); padding-bottom: 96px; }
+  .barra-topo { padding: var(--pc-e3) var(--pc-e4); }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   5. ÍCONES
+   Vuesax, vindos do kit. Pintados por `mask` para seguirem o
+   currentColor e trocarem de tema sozinhos.
+
+   O caminho está declarado AQUI, no CSS, de propósito: um url() dentro
+   de uma custom property resolve-se relativo à folha onde foi
+   declarado. Declarar no HTML partia os caminhos, que foi o bug que
+   apagou os ícones do Cartório.
+   ─────────────────────────────────────────────────────────────────── */
+
+.icone {
+  display: inline-block;
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+  vertical-align: -4px;
+  background-color: currentColor;
+  -webkit-mask: var(--i) center / contain no-repeat;
+  mask: var(--i) center / contain no-repeat;
+}
+.icone-24 { width: 24px; height: 24px; vertical-align: -6px; }
+.icone-16 { width: 16px; height: 16px; vertical-align: -3px; }
+
+.i-conta        { --i: url(../icones/conta.svg); }
+.i-cartao       { --i: url(../icones/cartao.svg); }
+.i-contas       { --i: url(../icones/contas.svg); }
+.i-transferir   { --i: url(../icones/transferir.svg); }
+.i-recibo       { --i: url(../icones/recibo.svg); }
+.i-aprovado     { --i: url(../icones/aprovado.svg); }
+.i-definicoes   { --i: url(../icones/definicoes.svg); }
+.i-sino         { --i: url(../icones/sino.svg); }
+.i-procurar     { --i: url(../icones/procurar.svg); }
+.i-utilizador   { --i: url(../icones/utilizador.svg); }
+.i-seta-cima    { --i: url(../icones/seta-cima.svg); }
+.i-seta-baixo   { --i: url(../icones/seta-baixo.svg); }
+.i-seta-direita { --i: url(../icones/seta-direita.svg); }
+.i-seta-esquerda{ --i: url(../icones/seta-esquerda.svg); }
+.i-mais         { --i: url(../icones/mais.svg); }
+.i-info         { --i: url(../icones/info.svg); }
+.i-exportar     { --i: url(../icones/exportar.svg); }
+.i-ler          { --i: url(../icones/ler.svg); }
+.i-escudo       { --i: url(../icones/escudo.svg); }
+.i-lua          { --i: url(../icones/lua.svg); }
+.i-categorias   { --i: url(../icones/categorias.svg); }
+.i-recebido     { --i: url(../icones/recebido.svg); }
+
+/* ───────────────────────────────────────────────────────────────────
+   6. BOTÕES
+   O primário é lima com tinta por cima. Não existe botão lima com
+   texto branco: dá 1,10:1 e ninguém o lê.
+   ─────────────────────────────────────────────────────────────────── */
+
+button, .botao {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pc-e2);
+  min-height: 44px;
+  padding: 0 var(--pc-e4);
+  border: 1px solid transparent;
+  border-radius: var(--pc-r-controlo);
+  background: var(--pc-destaque);
+  color: var(--pc-sobre-destaque);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--pc-t-rapida), transform var(--pc-t-rapida),
+              border-color var(--pc-t-rapida), color var(--pc-t-rapida);
+}
+button:hover, .botao:hover { background: var(--pc-lima-fundo); }
+button:active, .botao:active { transform: translateY(1px); }
+button:disabled, .botao[aria-disabled="true"] {
+  opacity: .5; cursor: not-allowed; transform: none;
+}
+
+.secundario {
+  background: transparent;
+  color: var(--pc-texto);
+  border-color: var(--pc-linha);
+}
+.secundario:hover { background: var(--pc-chao-suave); border-color: var(--pc-texto-suave); }
+
+.perigo { background: var(--pc-erro); color: var(--pc-chao); }
+.perigo:hover { background: var(--pc-erro); filter: brightness(1.1); }
+
+.fantasma {
+  background: transparent; color: var(--pc-texto-suave);
+  border-color: transparent; min-height: 36px; padding: 0 var(--pc-e3);
+}
+.fantasma:hover { background: var(--pc-chao-suave); color: var(--pc-texto); }
+
+.botao-icone {
+  width: 40px; height: 40px; min-height: 0; padding: 0;
+  border-radius: var(--pc-r-controlo);
+  background: transparent; color: var(--pc-texto-suave);
+  border-color: var(--pc-linha);
+}
+.botao-icone:hover { background: var(--pc-chao-suave); color: var(--pc-texto); }
+
+.fila { display: flex; gap: var(--pc-e2); align-items: center; flex-wrap: wrap; }
+
+/* ───────────────────────────────────────────────────────────────────
+   7. FORMULÁRIOS
+   Rótulo por cima, ajuda a seguir, erro por baixo. Nunca placeholder
+   como rótulo: quando se escreve, o rótulo desaparece.
+   ─────────────────────────────────────────────────────────────────── */
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pc-texto);
+  margin: var(--pc-e4) 0 var(--pc-e2);
+}
+label:first-child { margin-top: 0; }
+
+input, select, textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  min-height: 44px;
+  padding: var(--pc-e3);
+  color: var(--pc-texto);
+  background: var(--pc-superficie);
+  border: 1px solid var(--pc-linha);
+  border-radius: var(--pc-r-controlo);
+  transition: border-color var(--pc-t-rapida), box-shadow var(--pc-t-rapida);
+}
+input::placeholder { color: var(--pc-texto-suave); opacity: 1; }
+input:hover, select:hover, textarea:hover { border-color: var(--pc-texto-suave); }
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--pc-texto);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pc-lima) 55%, transparent);
+}
+input[aria-invalid="true"] { border-color: var(--pc-erro); }
+
+select {
+  appearance: none;
+  padding-right: var(--pc-e6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--pc-e3) center;
+}
+
+.ajuda { font-size: 12px; color: var(--pc-texto-suave); margin: var(--pc-e2) 0 0; }
+
+/* ───────────────────────────────────────────────────────────────────
+   8. PAINÉIS
+   ─────────────────────────────────────────────────────────────────── */
+
+.painel {
+  background: var(--pc-superficie);
+  border: 1px solid var(--pc-linha);
+  border-radius: var(--pc-r-painel);
+  padding: var(--pc-e5);
+}
+.painel + .painel { margin-top: var(--pc-e4); }
+.painel-cabeca {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--pc-e3); margin-bottom: var(--pc-e4);
+}
+
+.vazio {
+  color: var(--pc-texto-suave);
+  text-align: center;
+  padding: var(--pc-e7) var(--pc-e4);
+  margin: 0;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   9. CARTÃO DE CONTA
+   O que o kit chama "My cards". Aqui não há Visa: há IBAN PT50, e o
+   cartão diz a verdade sobre o que somos.
+   ─────────────────────────────────────────────────────────────────── */
+
+.cartao-conta {
+  position: relative;
+  overflow: hidden;
+  background: var(--pc-tinta);
+  color: #FFFFFF;
+  border-radius: var(--pc-r-painel);
+  padding: var(--pc-e5);
+  /* No tema escuro o cartão é quase da cor do chão e a aresta perde-se
+     num monitor de sala. Esta linha não se vê no tema claro (o cartão já
+     contrasta com o branco) e salva o escuro. */
+  border: 1px solid var(--pc-linha);
+}
+/* o lima entra como luz, não como texto */
+.cartao-conta::after {
+  content: "";
+  position: absolute;
+  top: -60%; right: -20%;
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(235, 255, 120, .22), transparent 68%);
+  pointer-events: none;
+}
+.cartao-conta > * { position: relative; }
+
+.cartao-rotulo {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .6);
+  margin: 0 0 var(--pc-e2);
+}
+.cartao-saldo {
+  font-family: 'Sora', sans-serif;
+  font-size: 36px; font-weight: 700;
+  letter-spacing: -0.03em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+.cartao-iban {
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-size: 13px; letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, .75);
+  margin: var(--pc-e4) 0 0;
+}
+.cartao-rodape {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: var(--pc-e4); margin-top: var(--pc-e5);
+}
+.cartao-preso { font-size: 12px; color: rgba(255, 255, 255, .6); }
+
+/* ───────────────────────────────────────────────────────────────────
+   9b. ENTRADA
+   O mesmo ecrã nas sete páginas: quem chega a `boletos.html` sem sessão
+   entra ali e fica ali, em vez de ser atirado para o index.
+   ─────────────────────────────────────────────────────────────────── */
+
+.entrada {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: var(--pc-e5);
+  background: var(--pc-chao-suave);
+}
+.entrada-caixa { width: 100%; max-width: 380px; }
+.entrada-marca {
+  width: 52px; height: 52px;
+  border-radius: var(--pc-r-painel);
+  background: var(--pc-lima);
+  color: var(--pc-tinta);
+  display: grid; place-items: center;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700; font-size: 19px;
+  margin: 0 auto var(--pc-e4);
+}
+.entrada-caixa h1 { text-align: center; font-size: 24px; }
+.entrada-caixa .sub {
+  text-align: center; color: var(--pc-texto-suave);
+  margin: var(--pc-e2) 0 var(--pc-e5);
+}
+.entrada-caixa button[type="submit"] { width: 100%; margin-top: var(--pc-e5); }
+
+/* ───────────────────────────────────────────────────────────────────
+   10. MOVIMENTOS
+   ─────────────────────────────────────────────────────────────────── */
+
+.movimento {
+  display: flex; align-items: center;
+  gap: var(--pc-e3);
+  padding: var(--pc-e3) 0;
+  border-bottom: 1px solid var(--pc-linha-suave);
+}
+.movimento:last-child { border-bottom: none; }
+.movimento > div:first-child { flex: 1; min-width: 0; }
+
+.mov-marca {
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: var(--pc-r-controlo);
+  display: grid; place-items: center;
+  background: var(--pc-chao-suave);
+  color: var(--pc-texto-suave);
+}
+
+/* só a primeira letra: esta classe serve a categoria ("salario") e a
+   descrição livre de um boleto, e `capitalize` escrevia
+   "Encomenda De Pao De Setembro" */
+.mov-categoria { font-weight: 600; font-size: 14px; }
+.mov-categoria::first-letter { text-transform: uppercase; }
+
+.mov-detalhe {
+  font-size: 12px; color: var(--pc-texto-suave);
+  margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mov-valor {
+  font-weight: 600; font-size: 14px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.mov-valor.entrada { color: var(--pc-ok); }
+.mov-valor.saida { color: var(--pc-texto); }
+.mov-valor.anulado { color: var(--pc-texto-suave); text-decoration: line-through; }
+
+/* ───────────────────────────────────────────────────────────────────
+   11. ESTADOS
+   Nunca só cor: cada estado leva também um ícone e uma palavra, para
+   quem não distingue cores continuar a perceber.
+   ─────────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 4px 9px;
+  border-radius: var(--pc-r-pilula);
+  background: var(--pc-chao-suave);
+  color: var(--pc-texto-suave);
+  white-space: nowrap;
+}
+.badge .icone { width: 12px; height: 12px; vertical-align: 0; }
+
+.badge-concluida, .badge-pago, .badge-paga {
+  background: var(--pc-ok-fundo); color: var(--pc-ok);
+}
+.badge-pendente, .badge-por_pagar, .badge-em_pagamento {
+  background: var(--pc-aviso-fundo); color: var(--pc-aviso);
+}
+.badge-rejeitada, .badge-cancelado, .badge-anulada, .badge-vencido {
+  background: var(--pc-erro-fundo); color: var(--pc-erro);
+}
+
+.msg { font-size: 13px; margin: var(--pc-e3) 0 0; color: var(--pc-texto-suave); }
+.msg.erro { color: var(--pc-erro); }
+.msg.aviso { color: var(--pc-aviso); }
+.msg.ok { color: var(--pc-ok); }
+.msg:empty { display: none; }
+
+.vencido { color: var(--pc-erro); font-weight: 600; }
+.linha-mb { color: var(--pc-texto); letter-spacing: 1px; font-size: 13px; }
+
+/* ───────────────────────────────────────────────────────────────────
+   12. ABAS
+   ─────────────────────────────────────────────────────────────────── */
+
+.abas {
+  display: flex; gap: var(--pc-e1);
+  border-bottom: 1px solid var(--pc-linha);
+  margin-bottom: var(--pc-e5);
+}
+.aba {
+  background: none; border: none; min-height: 0;
+  padding: var(--pc-e3) var(--pc-e4);
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--pc-texto-suave);
+  font-weight: 500;
+  cursor: pointer;
+}
+.aba:hover { background: transparent; color: var(--pc-texto); }
+.aba[aria-selected="true"] {
+  color: var(--pc-texto); font-weight: 600;
+  border-bottom-color: var(--pc-enfase);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   13. SELO DE RESULTADO
+   ─────────────────────────────────────────────────────────────────── */
+
+.selo { text-align: center; padding: var(--pc-e6) var(--pc-e4); }
+.selo-icone {
+  width: 56px; height: 56px; margin: 0 auto var(--pc-e4);
+  border-radius: var(--pc-r-pilula);
+  display: grid; place-items: center;
+  background: var(--pc-ok-fundo); color: var(--pc-ok);
+}
+.selo-erro .selo-icone { background: var(--pc-erro-fundo); color: var(--pc-erro); }
+.selo-titulo {
+  font-family: 'Sora', sans-serif;
+  font-size: 20px; font-weight: 600; letter-spacing: -0.02em;
+}
+.selo-subtitulo {
+  color: var(--pc-texto-suave);
+  max-width: 46ch; margin: var(--pc-e2) auto 0;
+}
+.selo-grade {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--pc-e3);
+  margin-top: var(--pc-e5);
+  text-align: left;
+}
+.selo-campo {
+  background: var(--pc-chao-suave);
+  border-radius: var(--pc-r-controlo);
+  padding: var(--pc-e3);
+}
+.selo-campo .rotulo {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--pc-texto-suave); margin-bottom: 3px;
+}
+.selo-campo .valor { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ───────────────────────────────────────────────────────────────────
+   14. GRÁFICOS
+   Feitos em SVG e CSS, sem biblioteca. Nenhum deles conta a história
+   só pela cor: todos levam número ou rótulo em texto.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* donut do saldo gasto */
+.donut { display: grid; place-items: center; position: relative; }
+.donut svg { transform: rotate(-90deg); display: block; }
+.donut .trilho { fill: none; stroke: var(--pc-linha-suave); }
+.donut .arco {
+  fill: none; stroke: var(--pc-enfase);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--pc-t-normal);
+}
+.donut-centro {
+  position: absolute; text-align: center;
+}
+.donut-valor {
+  font-family: 'Sora', sans-serif;
+  font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.donut-nota { font-size: 12px; color: var(--pc-texto-suave); margin-top: 2px; }
+
+/* barra segmentada de categorias */
+.barra-seg {
+  display: flex; height: 8px;
+  border-radius: var(--pc-r-pilula);
+  overflow: hidden;
+  background: var(--pc-linha-suave);
+  margin-bottom: var(--pc-e4);
+}
+/* o traço entre segmentos não é enfeite: duas categorias vizinhas podem
+   ter luminância parecida, e sem esta fresta encostavam-se e liam-se
+   como um bloco só */
+.barra-seg span {
+  display: block; height: 100%;
+  box-shadow: 1px 0 0 var(--pc-superficie);
+}
+.barra-seg span:last-child { box-shadow: none; }
+
+/* barras verticais */
+.barras-v {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: var(--pc-e2); height: 140px;
+}
+.barra-col {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: var(--pc-e2); height: 100%;
+}
+.barra-col .haste {
+  width: 100%; max-width: 34px; margin-top: auto;
+  background: var(--pc-linha);
+  border-radius: var(--pc-r-marca);
+  transition: background var(--pc-t-rapida);
+}
+.barra-col.destaque .haste { background: var(--pc-enfase); }
+.barra-col .dia { font-size: 11px; color: var(--pc-texto-suave); }
+.barra-col.destaque .dia { color: var(--pc-texto); font-weight: 600; }
+
+/* área da atividade */
+.area-svg { width: 100%; height: 140px; display: block; }
+.area-svg .traco { fill: none; stroke: var(--pc-enfase); stroke-width: 2; }
+.area-svg .preenche { fill: var(--pc-enfase); opacity: .12; }
+.area-svg .ponto { fill: var(--pc-enfase); stroke: var(--pc-superficie); stroke-width: 3; }
+
+.legenda { display: flex; flex-wrap: wrap; gap: var(--pc-e3); margin-top: var(--pc-e3); }
+.legenda-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--pc-texto-suave);
+}
+.legenda-marca {
+  width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   15. TABELAS
+   ─────────────────────────────────────────────────────────────────── */
+
+.tabela { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tabela th {
+  text-align: left; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--pc-texto-suave);
+  padding: var(--pc-e2) var(--pc-e2);
+  border-bottom: 1px solid var(--pc-linha);
+}
+.tabela td {
+  padding: var(--pc-e3) var(--pc-e2);
+  border-bottom: 1px solid var(--pc-linha-suave);
+}
+.tabela tr:last-child td { border-bottom: none; }
+.tabela .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rolavel { overflow-x: auto; }
+
+/* ───────────────────────────────────────────────────────────────────
+   16. DOCUMENTO A4
+   Boleto e comprovativo. O PDF sai pelo Imprimir do browser, por isso
+   o que se vê no ecrã tem de ser o que sai no papel. No papel não há
+   tema escuro nem lima de fundo: imprime-se a preto sobre branco.
+   ─────────────────────────────────────────────────────────────────── */
+
+.folha {
+  width: 210mm; min-height: 297mm;
+  margin: var(--pc-e5) auto;
+  padding: 18mm;
+  background: #FFFFFF;
+  color: #0A0C10;
+  box-shadow: var(--pc-sombra-alta);
+}
+.barra-acoes {
+  max-width: 210mm; margin: var(--pc-e5) auto 0;
+  display: flex; gap: var(--pc-e2); justify-content: flex-end;
+  padding: 0 var(--pc-e2);
+}
+
+.doc-topo {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-bottom: 2px solid #0A0C10;
+  padding-bottom: 10px; margin-bottom: 22px;
+}
+.doc-marca {
+  font-family: 'Sora', sans-serif;
+  font-size: 20px; font-weight: 700; letter-spacing: -0.02em;
+  color: #0A0C10;
+}
+.doc-id { font-size: 12px; color: #667085; }
+.doc-titulo { font-size: 15px; font-weight: 700; margin: 0 0 14px; }
+
+table.doc { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.doc td { border: 1px solid #DADADA; padding: 7px 9px; }
+table.doc td.rot { background: #F9FAFB; font-weight: 600; width: 32%; }
+
+.caixa-ref {
+  margin-top: 22px;
+  border: 2px solid #0A0C10;
+  border-radius: 8px;
+  padding: 16px;
+}
+.ref-grade { display: flex; gap: 28px; flex-wrap: wrap; }
+.ref-rot {
+  font-size: 10px; letter-spacing: 0.1em;
+  color: #667085; text-transform: uppercase;
+}
+.ref-val {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 20px; font-weight: 700; letter-spacing: 2px;
+}
+.ref-val.valor { color: #0A0C10; }
+.barras { display: flex; align-items: flex-end; height: 48px; margin-top: 14px; }
+.barras i { display: block; height: 100%; }
+.linha-digitos {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 13px; letter-spacing: 3px; margin-top: 5px;
+}
+
+.linhas-fatura { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 18px; }
+.linhas-fatura th {
+  text-align: left; font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: #667085;
+  border-bottom: 2px solid #DADADA; padding: 6px 4px;
+}
+.linhas-fatura td { padding: 7px 4px; border-bottom: 1px solid #F1F1F1; }
+.linhas-fatura .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.total-linha { font-weight: 700; font-size: 14px; }
+
+.rodape-doc {
+  margin-top: 26px; font-size: 9px; color: #667085;
+  font-style: italic; border-top: 1px solid #DADADA; padding-top: 10px;
+}
+
+@media print {
+  body { background: #FFFFFF; }
+  .barra-acoes, .nao-imprimir, .rail, .barra-topo { display: none !important; }
+  .folha { margin: 0; box-shadow: none; width: auto; min-height: 0; padding: 0; }
+  @page { size: A4; margin: 16mm; }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   17. UTILITÁRIOS
+   ─────────────────────────────────────────────────────────────────── */
+
+.suave { color: var(--pc-texto-suave); }
+.centro { text-align: center; }
+.direita { text-align: right; }
+.pilha { display: grid; gap: var(--pc-e3); }
+.so-leitores {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   18. MOVIMENTO REDUZIDO
+   ─────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

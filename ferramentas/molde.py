@@ -1,13 +1,29 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+"""Escreve o esqueleto comum das páginas do Prepacoin.
+
+O <head>, o ecrã de entrada, o rail e a barra de topo são iguais nas sete
+páginas. Escritos à mão ficavam diferentes uns dos outros, que foi
+exatamente o que aconteceu antes: cada ecrã tinha a sua navegação, com
+links diferentes. Aqui saem todos do mesmo sítio.
+
+Este script gera o ficheiro; o miolo de cada página vem de um dicionário
+em `PAGINAS`, mais abaixo, e é a única coisa que muda entre elas.
+"""
+
+import pathlib
+
+RAIZ = pathlib.Path(__file__).resolve().parent.parent
+
+CABECA = '''<!DOCTYPE html>
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prepacoin — Aprovações</title>
+  <title>{titulo_aba}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
-  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=2c4f04e7" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=CSS" />{estilo}
 </head>
 <body>
 
@@ -16,7 +32,7 @@
     <div class="entrada-caixa">
       <div class="entrada-marca" aria-hidden="true">P$</div>
       <h1>Prepacoin</h1>
-      <p class="sub">Entre para ver as transferências à espera.</p>
+      <p class="sub">{sub_entrada}</p>
       <form id="form-login" class="painel">
         <label for="email">Email de login</label>
         <input id="email" type="email" autocomplete="username" required />
@@ -33,33 +49,28 @@
     <div class="painel-principal">
       <header id="barra"></header>
       <main>
-
-        <div id="area-aprovacoes" hidden>
-          <div class="topo-pagina">
-            <div>
-              <h1>Aprovações</h1>
-              <p class="suave" style="margin:6px 0 0">
-                Transferências acima do limite da conta ficam aqui até um gerente
-                decidir. O saldo é revalidado no momento da aprovação.
-              </p>
-            </div>
-          </div>
-
-          <div class="painel">
-            <div id="lista-pendentes"><p class="vazio">A carregar…</p></div>
-          </div>
-
-          <p class="msg" id="msg-aprovacoes"></p>
-        </div>
+{miolo}
       </main>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
-  <script src="web/comum-banco.js?v=833d295f"></script>
-  <script src="web/tema.js?v=80d06e5f"></script>
-  <script src="web/parcial.js?v=f5f52630"></script>
-  <script src="aprovacoes.js?v=3fcc21bc"></script>
+  <script src="web/comum-banco.js?v=COMUM"></script>
+  <script src="web/tema.js?v=TEMA"></script>
+  <script src="web/parcial.js?v=PARCIAL"></script>
+  <script src="{script}?v=PAG"></script>
 </body>
 </html>
+'''
+
+
+def escrever(nome, titulo_aba, sub_entrada, miolo, script, estilo=''):
+    if estilo:
+        estilo = '\n  <style>\n' + estilo.rstrip() + '\n  </style>'
+    html = CABECA.format(
+        titulo_aba=titulo_aba, sub_entrada=sub_entrada,
+        miolo=miolo.rstrip(), script=script, estilo=estilo,
+    )
+    (RAIZ / nome).write_text(html, encoding='utf-8')
+    print('escrito', nome)

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prepacoin — biblioteca de design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css" />
+  <style>
+    .secao { margin-bottom: var(--pc-e8); }
+    .secao > h2 { margin-bottom: var(--pc-e4); }
+
+    .amostras { display: flex; flex-wrap: wrap; gap: var(--pc-e3); align-items: center; }
+
+    .grade-cor { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--pc-e3); }
+    .ficha-cor {
+      border: 1px solid var(--pc-linha);
+      border-radius: var(--pc-r-controlo);
+      overflow: hidden;
+    }
+    .ficha-cor .prova { height: 76px; display: grid; place-items: center; font-weight: 600; font-size: 13px; }
+    .ficha-cor .sobre { padding: var(--pc-e3); font-size: 12px; }
+    .ficha-cor .hex { font-family: ui-monospace, Consolas, monospace; font-weight: 600; color: var(--pc-texto); }
+    .ficha-cor .razao { color: var(--pc-texto-suave); margin-top: 3px; }
+
+    .grade-icones { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: var(--pc-e2); }
+    .ficha-icone {
+      display: flex; flex-direction: column; align-items: center; gap: var(--pc-e2);
+      padding: var(--pc-e3) var(--pc-e2);
+      border: 1px solid var(--pc-linha-suave);
+      border-radius: var(--pc-r-controlo);
+      font-size: 11px; color: var(--pc-texto-suave); text-align: center;
+    }
+
+    .escala > * { margin: 0 0 var(--pc-e2); }
+    .escala .nota { font-size: 11px; color: var(--pc-texto-suave); font-family: ui-monospace, Consolas, monospace; }
+
+    .aviso-lei {
+      border-left: 3px solid var(--pc-enfase);
+      padding: var(--pc-e3) var(--pc-e4);
+      background: var(--pc-chao-suave);
+      border-radius: 0 var(--pc-r-controlo) var(--pc-r-controlo) 0;
+      margin-bottom: var(--pc-e5);
+    }
+    .aviso-lei p { margin: 0; }
+    .aviso-lei p + p { margin-top: var(--pc-e2); }
+
+    .prova-mau { background: #FFFFFF; color: #EBFF78; }
+    .prova-bom { background: #EBFF78; color: #0A0C10; }
+    .par-prova { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--pc-e3); }
+    .par-prova div {
+      padding: var(--pc-e4); border-radius: var(--pc-r-controlo);
+      border: 1px solid var(--pc-linha); font-weight: 600;
+    }
+    .par-prova .veredicto { display: block; font-size: 11px; font-weight: 500; margin-top: 6px; opacity: .8; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <nav class="rail" aria-label="Navegação principal">
+      <div class="rail-marca" aria-hidden="true">P$</div>
+      <a href="index.html" title="A minha conta"><span class="icone icone-24 i-conta"></span><span class="so-leitores">A minha conta</span></a>
+      <a href="transferir.html" title="Transferir"><span class="icone icone-24 i-transferir"></span><span class="so-leitores">Transferir</span></a>
+      <a href="boletos.html" title="Boletos"><span class="icone icone-24 i-recibo"></span><span class="so-leitores">Boletos</span></a>
+      <a href="aprovacoes.html" title="Aprovações"><span class="icone icone-24 i-aprovado"></span><span class="so-leitores">Aprovações</span></a>
+      <a href="biblioteca.html" aria-current="page" class="empurra" title="Biblioteca"><span class="icone icone-24 i-categorias"></span><span class="so-leitores">Biblioteca</span></a>
+    </nav>
+
+    <div class="painel-principal">
+      <header class="barra-topo">
+        <span class="marca">Prepacoin</span>
+        <div class="fila">
+          <button type="button" class="botao-icone" id="btn-tema" title="Alternar tema">
+            <span class="icone i-lua"></span><span class="so-leitores">Alternar tema</span>
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <div class="topo-pagina">
+          <div>
+            <h1>Biblioteca de design</h1>
+            <p class="suave" style="margin-top:6px">
+              Tudo o que o Prepacoin usa para se desenhar. Identidade adotada
+              do kit Nexus Bank.
+            </p>
+          </div>
+        </div>
+
+        <!-- ══ a regra que explica todo o resto ══ -->
+        <section class="secao">
+          <h2>A regra que decide tudo</h2>
+          <div class="aviso-lei">
+            <p>
+              O lima tem <strong>1,10:1</strong> de contraste sobre branco. Não
+              é gosto, é medição: no tema claro ele desaparece como texto. Só
+              serve como <strong>preenchimento</strong>, e sempre com a tinta
+              por cima, onde dá 17,81:1.
+            </p>
+            <p>
+              Daí a lei: no tema claro é a <strong>tinta</strong> que carrega a
+              ênfase e o lima preenche. No tema escuro trocam de papel, e o
+              lima passa a poder ser texto e traço. Carregue no botão da lua
+              para ver a troca.
+            </p>
+          </div>
+
+          <div class="par-prova">
+            <div class="prova-mau">
+              Lima sobre branco
+              <span class="veredicto">1,10:1 · reprova, nunca usar assim</span>
+            </div>
+            <div class="prova-bom">
+              Tinta sobre lima
+              <span class="veredicto">17,81:1 · é assim que o lima entra</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ cores ══ -->
+        <section class="secao">
+          <h2>Cores</h2>
+          <div class="grade-cor">
+            <div class="ficha-cor">
+              <div class="prova" style="background:#EBFF78; color:#0A0C10">Aa</div>
+              <div class="sobre"><div class="hex">#EBFF78</div><div class="razao">Lima. A marca. Preenchimento nos dois temas.</div></div>
+            </div>
+            <div class="ficha-cor">
+              <div class="prova" style="background:#0A0C10; color:#FFFFFF">Aa</div>
+              <div class="sobre"><div class="hex">#0A0C10</div><div class="razao">Tinta. Texto no claro, chão no escuro.</div></div>
+            </div>
+            <div class="ficha-cor">
+              <div class="prova" style="background:#667085; color:#FFFFFF">Aa</div>
+              <div class="sobre"><div class="hex">#667085</div><div class="razao">Texto secundário, só no claro. 4,97:1.</div></div>
+            </div>
+            <div class="ficha-cor">
+              <div class="prova" style="background:#98A2B3; color:#0A0C10">Aa</div>
+              <div class="sobre"><div class="hex">#98A2B3</div><div class="razao">Texto secundário, só no escuro. Sobre branco dá 2,58:1 e reprova.</div></div>
+            </div>
+            <div class="ficha-cor">
+              <div class="prova" style="background:#1A7F37; color:#FFFFFF">Aa</div>
+              <div class="sobre"><div class="hex">#1A7F37</div><div class="razao">Sucesso no claro. 5,08:1.</div></div>
+            </div>
+            <div class="ficha-cor">
+              <div class="prova" style="background:#B42318; color:#FFFFFF">Aa</div>
+              <div class="sobre"><div class="hex">#B42318</div><div class="razao">Erro no claro. 6,57:1.</div></div>
+            </div>
+            <div class="ficha-cor">
+              <div class="prova" style="background:#B54708; color:#FFFFFF">Aa</div>
+              <div class="sobre"><div class="hex">#B54708</div><div class="razao">Aviso no claro. 5,43:1.</div></div>
+            </div>
+            <div class="ficha-cor">
+              <div class="prova" style="background:#DADADA; color:#0A0C10">Aa</div>
+              <div class="sobre"><div class="hex">#DADADA</div><div class="razao">Linha. Separa sem pesar.</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ tipografia ══ -->
+        <section class="secao">
+          <h2>Tipografia</h2>
+          <div class="painel escala">
+            <h1>Sora 700, 28px</h1>
+            <p class="nota">títulos de página e números grandes</p>
+            <h2>Sora 600, 18px</h2>
+            <p class="nota">títulos de painel</p>
+            <p style="font-size:14px">Inter 400, 14px. O corpo do texto, a 1,5 de entrelinha.</p>
+            <p class="nota">corpo</p>
+            <p class="numero" style="font-family:Sora; font-size:36px; font-weight:700; letter-spacing:-0.03em">P$ 1 248,40</p>
+            <p class="nota">dinheiro em Sora com tabular-nums, para as colunas alinharem</p>
+          </div>
+        </section>
+
+        <!-- ══ ícones ══ -->
+        <section class="secao">
+          <h2>Ícones</h2>
+          <p class="suave">
+            Vuesax, vindos do kit. Pintados por máscara CSS, por isso seguem a
+            cor do texto e trocam de tema sozinhos.
+          </p>
+          <div class="grade-icones" id="grade-icones"></div>
+        </section>
+
+        <!-- ══ botões ══ -->
+        <section class="secao">
+          <h2>Botões</h2>
+          <div class="painel">
+            <div class="amostras">
+              <button type="button">Confirmar pagamento</button>
+              <button type="button" class="secundario">Desistir</button>
+              <button type="button" class="perigo">Cancelar boleto</button>
+              <button type="button" class="fantasma">Ver tudo</button>
+              <button type="button" class="botao-icone"><span class="icone i-procurar"></span><span class="so-leitores">Procurar</span></button>
+              <button type="button" disabled>Indisponível</button>
+            </div>
+            <p class="ajuda">
+              Altura mínima de 44px em todos, que é o alvo de toque mínimo.
+              O primário é sempre lima com tinta por cima.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ formulário ══ -->
+        <section class="secao">
+          <h2>Formulários</h2>
+          <div class="grade grade-2">
+            <div class="painel">
+              <label for="ex-valor">Valor</label>
+              <input id="ex-valor" inputmode="decimal" placeholder="0,00" />
+              <p class="ajuda">Escreva em P$, por exemplo 25,00.</p>
+
+              <label for="ex-cat">Categoria</label>
+              <select id="ex-cat">
+                <option>Salário</option>
+                <option>Imposto</option>
+                <option>Renda</option>
+              </select>
+            </div>
+            <div class="painel">
+              <label for="ex-erro">Referência</label>
+              <input id="ex-erro" value="937456151" aria-invalid="true" aria-describedby="ex-erro-msg" />
+              <p class="msg erro" id="ex-erro-msg">Referência inválida. Confira os dígitos.</p>
+              <p class="ajuda">
+                O rótulo fica por cima, a ajuda a seguir e o erro por baixo do
+                campo a que pertence.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ cartão + movimentos ══ -->
+        <section class="secao">
+          <h2>Cartão de conta e movimentos</h2>
+          <div class="grade grade-conta">
+            <div class="cartao-conta">
+              <p class="cartao-rotulo">Saldo disponível</p>
+              <p class="cartao-saldo numero">P$ 1 990,20</p>
+              <p class="cartao-iban">PT50 0006 9208 7132 1354 1502 1</p>
+              <div class="cartao-rodape">
+                <span class="cartao-preso">Nada preso em pendentes</span>
+                <span class="badge badge-concluida"><span class="icone i-aprovado"></span>Ativa</span>
+              </div>
+            </div>
+            <div class="painel">
+              <div class="painel-cabeca"><h3>Movimentos</h3></div>
+              <div class="movimento">
+                <div class="mov-marca"><span class="icone i-seta-baixo"></span></div>
+                <div>
+                  <div class="mov-categoria">encomenda de pão</div>
+                  <div class="mov-detalhe">de Professor Prepara · 04/09/2026</div>
+                </div>
+                <div class="mov-valor entrada numero">+ P$ 40,20</div>
+              </div>
+              <div class="movimento">
+                <div class="mov-marca"><span class="icone i-seta-cima"></span></div>
+                <div>
+                  <div class="mov-categoria">imposto</div>
+                  <div class="mov-detalhe">Autoridade Tributária · 03/09/2026</div>
+                </div>
+                <div class="mov-valor saida numero">- P$ 50,00</div>
+              </div>
+              <div class="movimento">
+                <div class="mov-marca"><span class="icone i-seta-cima"></span></div>
+                <div>
+                  <div class="mov-categoria">renda</div>
+                  <div class="mov-detalhe">Recusada por falta de saldo · 02/09/2026</div>
+                </div>
+                <div class="mov-valor anulado numero">- P$ 300,00</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ estados ══ -->
+        <section class="secao">
+          <h2>Estados</h2>
+          <div class="painel">
+            <div class="amostras">
+              <span class="badge badge-concluida"><span class="icone i-aprovado"></span>Concluída</span>
+              <span class="badge badge-pendente"><span class="icone i-info"></span>Pendente</span>
+              <span class="badge badge-rejeitada"><span class="icone i-info"></span>Rejeitada</span>
+              <span class="badge badge-por_pagar"><span class="icone i-info"></span>Por pagar</span>
+              <span class="badge badge-pago"><span class="icone i-aprovado"></span>Pago</span>
+              <span class="badge badge-cancelado"><span class="icone i-info"></span>Cancelado</span>
+            </div>
+            <p class="ajuda">
+              Cada estado leva ícone e palavra, nunca só a cor. Quem não
+              distingue vermelho de verde continua a perceber o que se passa.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ gráficos ══ -->
+        <section class="secao">
+          <h2>Gráficos</h2>
+          <div class="grade grade-3">
+            <div class="painel">
+              <h3 style="margin-bottom:var(--pc-e4)">Saldo gasto</h3>
+              <div class="donut">
+                <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="68 por cento do saldo gasto">
+                  <circle class="trilho" cx="75" cy="75" r="62" stroke-width="14" />
+                  <circle class="arco" cx="75" cy="75" r="62" stroke-width="14"
+                          stroke-dasharray="389.6" stroke-dashoffset="124.7" />
+                </svg>
+                <div class="donut-centro">
+                  <div class="donut-valor">68%</div>
+                  <div class="donut-nota">de P$ 1 284,00</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="painel">
+              <h3 style="margin-bottom:var(--pc-e4)">Por categoria</h3>
+              <div class="barra-seg" role="img" aria-label="Repartição por categoria">
+                <span style="width:42%; background:var(--pc-s1)"></span>
+                <span style="width:28%; background:var(--pc-s2)"></span>
+                <span style="width:18%; background:var(--pc-s3)"></span>
+                <span style="width:12%; background:var(--pc-s4)"></span>
+              </div>
+              <div class="legenda">
+                <span class="legenda-item"><span class="legenda-marca" style="background:var(--pc-s1)"></span>Salários 42%</span>
+                <span class="legenda-item"><span class="legenda-marca" style="background:var(--pc-s2)"></span>Impostos 28%</span>
+                <span class="legenda-item"><span class="legenda-marca" style="background:var(--pc-s3)"></span>Renda 18%</span>
+                <span class="legenda-item"><span class="legenda-marca" style="background:var(--pc-s4)"></span>Utilities 12%</span>
+              </div>
+            </div>
+
+            <div class="painel">
+              <h3 style="margin-bottom:var(--pc-e4)">Pagamentos</h3>
+              <div class="barras-v">
+                <div class="barra-col"><div class="haste" style="height:45%"></div><span class="dia">Seg</span></div>
+                <div class="barra-col"><div class="haste" style="height:70%"></div><span class="dia">Ter</span></div>
+                <div class="barra-col"><div class="haste" style="height:30%"></div><span class="dia">Qua</span></div>
+                <div class="barra-col"><div class="haste" style="height:55%"></div><span class="dia">Qui</span></div>
+                <div class="barra-col destaque"><div class="haste" style="height:100%"></div><span class="dia">Sex</span></div>
+                <div class="barra-col"><div class="haste" style="height:48%"></div><span class="dia">Sáb</span></div>
+                <div class="barra-col"><div class="haste" style="height:38%"></div><span class="dia">Dom</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ selo ══ -->
+        <section class="secao">
+          <h2>Selo de resultado</h2>
+          <div class="painel">
+            <div class="selo">
+              <div class="selo-icone"><span class="icone icone-24 i-aprovado"></span></div>
+              <div class="selo-titulo">Fatura emitida</div>
+              <div class="selo-subtitulo">
+                O boleto já está à espera de pagamento. Entregue a entidade e a
+                referência a quem tem de pagar.
+              </div>
+              <div class="selo-grade">
+                <div class="selo-campo"><div class="rotulo">Fatura</div><div class="valor">FT-2026-000008</div></div>
+                <div class="selo-campo"><div class="rotulo">Total</div><div class="valor">P$ 40,20</div></div>
+                <div class="selo-campo"><div class="rotulo">Entidade</div><div class="valor mono">20009</div></div>
+                <div class="selo-campo"><div class="rotulo">Referência</div><div class="valor mono">937 456 155</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ raios ══ -->
+        <section class="secao">
+          <h2>Raios</h2>
+          <div class="painel">
+            <div class="amostras">
+              <div style="width:80px;height:56px;background:var(--pc-chao-suave);border:1px solid var(--pc-linha);border-radius:4px;display:grid;place-items:center;font-size:11px">4px</div>
+              <div style="width:80px;height:56px;background:var(--pc-chao-suave);border:1px solid var(--pc-linha);border-radius:12px;display:grid;place-items:center;font-size:11px">12px</div>
+              <div style="width:80px;height:56px;background:var(--pc-chao-suave);border:1px solid var(--pc-linha);border-radius:16px;display:grid;place-items:center;font-size:11px">16px</div>
+              <div style="width:80px;height:56px;background:var(--pc-chao-suave);border:1px solid var(--pc-linha);border-radius:999px;display:grid;place-items:center;font-size:11px">999px</div>
+            </div>
+            <p class="ajuda">
+              Marcas e traços a 4px, controlos a 12px, painéis a 16px, pílulas
+              e avatares a 999px. Um sistema só, seguido em todo o lado.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="web/tema.js?v=80d06e5f"></script>
+  <script>
+    // A grelha de ícones monta-se a partir da lista, para nunca ficar
+    // dessincronizada das classes que existem mesmo no CSS.
+    const ICONES = ['conta','cartao','contas','transferir','recibo','aprovado',
+      'definicoes','sino','procurar','utilizador','seta-cima','seta-baixo',
+      'seta-direita','seta-esquerda','mais','info','exportar','ler','escudo',
+      'lua','categorias','recebido'];
+    document.getElementById('grade-icones').innerHTML = ICONES.map((n) => `
+      <div class="ficha-icone">
+        <span class="icone icone-24 i-${n}"></span>
+        <span>${n}</span>
+      </div>`).join('');
+  </script>
+</body>
+</html>

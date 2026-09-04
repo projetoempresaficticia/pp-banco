@@ -2,10 +2,7 @@
 // transações das contas que a pessoa vê; a decisão em si é validada de
 // novo no servidor (só gerente da empresa dona da conta de origem).
 
-const areaLogin = document.getElementById('area-login');
 const areaAprovacoes = document.getElementById('area-aprovacoes');
-const formLogin = document.getElementById('form-login');
-const msgLogin = document.getElementById('msg-login');
 const msgAprovacoes = document.getElementById('msg-aprovacoes');
 
 async function carregarPendentes() {
@@ -39,7 +36,7 @@ async function carregarPendentes() {
         </div>
         <div style="display:flex; gap:0.5rem; flex-shrink:0">
           <button type="button" style="margin:0" data-aprovar="${t.id}">
-            <img class="icone" src="web/icons/check-01.svg" alt="" style="filter:brightness(0) invert(1)" />
+            <span class="icone i-aprovado"></span>
             Aprovar
           </button>
           <button type="button" class="perigo" style="margin:0" data-rejeitar="${t.id}">Rejeitar</button>
@@ -77,21 +74,10 @@ async function decidir(id, aprovar, botao) {
 async function verificarSessao() {
   const { data } = await sb.auth.getSession();
   if (!data.session) return;
-  areaLogin.hidden = true;
+  pcMostrarApp('Aprovações');
   areaAprovacoes.hidden = false;
   carregarPendentes();
 }
 
-formLogin.addEventListener('submit', async (ev) => {
-  ev.preventDefault();
-  const email = document.getElementById('email').value;
-  const senha = document.getElementById('senha').value;
-  const { error } = await sb.auth.signInWithPassword({ email, password: senha });
-  if (error) {
-    mostrarMsg(msgLogin, 'Login inválido.', 'erro');
-    return;
-  }
-  await verificarSessao();
-});
-
+pcLigarEntrada(verificarSessao);
 verificarSessao();

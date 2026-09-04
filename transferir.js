@@ -2,10 +2,6 @@
 // pessoa controla; o servidor volta a validar isso de qualquer forma
 // (banco_transferir compara com auth.uid(), nunca confia no parâmetro).
 
-const areaLogin = document.getElementById('area-login');
-const areaTransferir = document.getElementById('area-transferir');
-const formLogin = document.getElementById('form-login');
-const msgLogin = document.getElementById('msg-login');
 const seletorOrigem = document.getElementById('origem');
 const infoOrigem = document.getElementById('info-origem');
 
@@ -120,8 +116,7 @@ async function verificarSessao() {
   const { data } = await sb.auth.getSession();
   if (!data.session) return;
 
-  areaLogin.hidden = true;
-  areaTransferir.hidden = false;
+  pcMostrarApp('Transferir');
 
   contas = await carregarContas();
   if (!contas.length) {
@@ -135,16 +130,5 @@ async function verificarSessao() {
   mostrarInfoOrigem();
 }
 
-formLogin.addEventListener('submit', async (ev) => {
-  ev.preventDefault();
-  const email = document.getElementById('email').value;
-  const senha = document.getElementById('senha').value;
-  const { error } = await sb.auth.signInWithPassword({ email, password: senha });
-  if (error) {
-    mostrarMsg(msgLogin, 'Login inválido.', 'erro');
-    return;
-  }
-  await verificarSessao();
-});
-
+pcLigarEntrada(verificarSessao);
 verificarSessao();

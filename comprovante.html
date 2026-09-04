@@ -1,56 +1,74 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prepacoin — Comprovante</title>
-  <link rel="stylesheet" href="web/estilos.css?v=9c21eddd" />
+  <title>Prepacoin — Verificar comprovativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=2c4f04e7" />
+  <style>
+    /* Esta página é pública: não leva rail nem sessão. Quem chega aqui
+       vem de um código que alguém lhe deu, e só quer saber se é
+       verdadeiro. Por isso o ecrã é uma coisa só, centrada. */
+    .publica { max-width: 560px; margin: 0 auto; padding: var(--pc-e7) var(--pc-e4); }
+    .publica-topo { text-align: center; margin-bottom: var(--pc-e6); }
+    .publica-marca {
+      width: 52px; height: 52px; border-radius: var(--pc-r-painel);
+      background: var(--pc-lima); color: var(--pc-tinta);
+      display: grid; place-items: center;
+      font-family: 'Sora', sans-serif; font-weight: 700; font-size: 19px;
+      margin: 0 auto var(--pc-e4);
+    }
+    #codigo { text-transform: uppercase; letter-spacing: 3px; font-size: 16px; }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="cabecalho-marca">
-      <div class="marca-moeda" aria-hidden="true">P$</div>
-      <strong>Prepacoin</strong>
+  <div class="publica">
+    <div class="publica-topo">
+      <div class="publica-marca" aria-hidden="true">P$</div>
+      <h1>Verificar comprovativo</h1>
+      <p class="suave" style="margin-top:var(--pc-e2)">
+        Qualquer pessoa pode conferir um comprovativo aqui, sem entrar na conta.
+        Dos IBAN só se mostram os últimos quatro dígitos.
+      </p>
     </div>
-    <nav>
-      <a href="index.html">A minha conta</a>
-      <a href="boletos.html">Boletos</a>
-    </nav>
-  </header>
 
-  <main>
-    <h1>Verificar comprovante</h1>
-    <p class="msg" style="color:#7A7A85; margin-bottom:1.25rem">
-      Qualquer pessoa pode conferir um comprovante aqui, sem entrar na conta.
-      Só se mostram os últimos 4 dígitos de cada IBAN.
-    </p>
-
-    <form id="form-verificar" class="painel" style="max-width:420px">
+    <form id="form-verificar" class="painel">
       <label for="codigo">Código de autenticação</label>
-      <input id="codigo" placeholder="12 caracteres" required />
-      <button type="submit">
-        <img class="icone" src="web/icons/shield-check.svg" alt="" style="filter:brightness(0) invert(1)" />
-        Verificar
+      <input id="codigo" class="mono" placeholder="A2E4FC7DA05A" maxlength="12"
+             autocomplete="off" spellcheck="false" required />
+      <p class="ajuda">São 12 caracteres, e vêm no comprovativo da transferência.</p>
+      <button type="submit" style="width:100%; margin-top:var(--pc-e4)">
+        <span class="icone i-escudo"></span>Verificar
       </button>
       <p class="msg" id="msg-verificar"></p>
     </form>
 
-    <div id="resultado" class="selo" hidden>
-      <div class="selo-icone"><img class="icone" src="web/icons/shield-check.svg" alt="" /></div>
-      <div class="selo-titulo" id="v-titulo">—</div>
-      <div class="selo-subtitulo" id="v-subtitulo">—</div>
-      <div class="selo-grade">
-        <div class="selo-campo"><div class="rotulo">Valor</div><div class="valor" id="v-valor">—</div></div>
-        <div class="selo-campo"><div class="rotulo">Categoria</div><div class="valor" id="v-categoria">—</div></div>
-        <div class="selo-campo"><div class="rotulo">Data</div><div class="valor" id="v-data">—</div></div>
-        <div class="selo-campo"><div class="rotulo">Contas</div><div class="valor" id="v-contas">—</div></div>
+    <div id="resultado" class="painel" style="margin-top:var(--pc-e4)" hidden>
+      <div class="selo">
+        <div class="selo-icone"><span class="icone icone-24 i-escudo"></span></div>
+        <div class="selo-titulo" id="v-titulo">—</div>
+        <div class="selo-subtitulo" id="v-subtitulo">—</div>
+        <div class="selo-grade">
+          <div class="selo-campo"><div class="rotulo">Valor</div><div class="valor numero" id="v-valor">—</div></div>
+          <div class="selo-campo"><div class="rotulo">Categoria</div><div class="valor" id="v-categoria">—</div></div>
+          <div class="selo-campo"><div class="rotulo">Data</div><div class="valor" id="v-data">—</div></div>
+          <div class="selo-campo"><div class="rotulo">Contas</div><div class="valor mono" id="v-contas">—</div></div>
+        </div>
       </div>
     </div>
-  </main>
+
+    <p class="centro" style="margin-top:var(--pc-e6)">
+      <a href="index.html" class="fantasma">Entrar no Prepacoin</a>
+    </p>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
-  <script src="web/comum-banco.js?v=ea63aa24"></script>
+  <script src="web/comum-banco.js?v=833d295f"></script>
+  <script src="web/tema.js?v=80d06e5f"></script>
   <script src="comprovante.js?v=c02eacea"></script>
 </body>
 </html>

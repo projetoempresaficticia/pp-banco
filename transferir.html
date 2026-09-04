@@ -1,76 +1,114 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prepacoin — Transferir</title>
-  <link rel="stylesheet" href="web/estilos.css?v=9c21eddd" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=2c4f04e7" />
 </head>
 <body>
-  <header>
-    <div class="cabecalho-marca">
-      <div class="marca-moeda" aria-hidden="true">P$</div>
-      <strong>Prepacoin</strong>
-    </div>
-    <nav>
-      <a href="index.html">← A minha conta</a>
-      <a href="boletos.html">Boletos</a>
-    </nav>
-  </header>
 
-  <main>
-    <div id="area-login" class="painel" style="max-width:360px">
-      <h2>Entrar</h2>
-      <form id="form-login">
+  <!-- entrada: quem chega aqui sem sessão entra e fica nesta página -->
+  <div id="area-login" class="entrada">
+    <div class="entrada-caixa">
+      <div class="entrada-marca" aria-hidden="true">P$</div>
+      <h1>Prepacoin</h1>
+      <p class="sub">Entre para fazer uma transferência.</p>
+      <form id="form-login" class="painel">
         <label for="email">Email de login</label>
-        <input id="email" type="email" required />
+        <input id="email" type="email" autocomplete="username" required />
         <label for="senha">Senha</label>
-        <input id="senha" type="password" required />
+        <input id="senha" type="password" autocomplete="current-password" required />
         <button type="submit">Entrar</button>
         <p class="msg" id="msg-login"></p>
       </form>
     </div>
+  </div>
 
-    <div id="area-transferir" hidden>
-      <h1>Nova transferência</h1>
+  <div class="app" id="app" hidden>
+    <nav id="rail"></nav>
+    <div class="painel-principal">
+      <header id="barra"></header>
+      <main>
 
-      <form id="form-transferir" class="painel">
-        <label for="origem">De qual conta sai</label>
-        <select id="origem" required></select>
-        <p class="msg" id="info-origem"></p>
+        <div class="topo-pagina">
+          <div>
+            <h1>Nova transferência</h1>
+            <p class="suave" style="margin:6px 0 0">
+              O dinheiro sai da conta que escolher e entra no IBAN de destino.
+            </p>
+          </div>
+        </div>
 
-        <label for="destino">IBAN de destino</label>
-        <input id="destino" placeholder="PT50…" required />
+        <div class="grade grade-conta">
+          <form id="form-transferir" class="painel">
+            <label for="origem">De qual conta sai</label>
+            <select id="origem" required></select>
+            <p class="msg" id="info-origem"></p>
 
-        <label for="valor">Valor (P$)</label>
-        <input id="valor" inputmode="decimal" placeholder="0,00" required />
+            <label for="destino">IBAN de destino</label>
+            <input id="destino" placeholder="PT50 0000 0000 0000 0000 0000 0" required />
+            <p class="ajuda">Pode escrever com ou sem espaços.</p>
 
-        <label for="categoria">Categoria</label>
-        <select id="categoria" required>
-          <option value="venda">Venda</option>
-          <option value="salario">Salário</option>
-          <option value="imposto">Imposto</option>
-          <option value="renda">Renda</option>
-          <option value="utilities">Utilities (água, energia…)</option>
-          <option value="outro">Outro</option>
-        </select>
-        <p class="msg" style="color:#7A7A85">
-          Salário, imposto, renda e utilities são obrigações: se não houver saldo,
-          a empresa fica em incumprimento.
-        </p>
+            <label for="valor">Valor</label>
+            <input id="valor" inputmode="decimal" placeholder="0,00" required />
+            <p class="ajuda">Em P$, por exemplo 25,00.</p>
 
-        <label for="descricao">Descrição</label>
-        <input id="descricao" placeholder="Referência do pagamento" />
+            <label for="categoria">Categoria</label>
+            <select id="categoria" required>
+              <option value="venda">Venda</option>
+              <option value="salario">Salário</option>
+              <option value="imposto">Imposto</option>
+              <option value="renda">Renda</option>
+              <option value="utilities">Utilities (água, energia, internet)</option>
+              <option value="outro">Outro</option>
+            </select>
 
-        <button type="submit" id="btn-transferir">Transferir</button>
-        <p class="msg" id="msg-transferir"></p>
-      </form>
+            <label for="descricao">Descrição</label>
+            <input id="descricao" placeholder="Referência do pagamento" />
+
+            <button type="submit" id="btn-transferir">
+              <span class="icone i-transferir"></span>Transferir
+            </button>
+            <p class="msg" id="msg-transferir"></p>
+          </form>
+
+          <div>
+            <div class="painel">
+              <div class="painel-cabeca"><h3>Antes de confirmar</h3></div>
+              <p class="suave" style="font-size:13px">
+                Salário, imposto, renda e utilities são <strong>obrigações</strong>.
+                Se a conta não tiver saldo para uma delas, a empresa fica marcada
+                em incumprimento, e isso aparece a quem consultar a certidão no
+                Cartório.
+              </p>
+              <p class="suave" style="font-size:13px">
+                Uma venda sem saldo é apenas recusada e fica no extrato como
+                rejeitada. Um erro a escrever não leva ninguém à falência.
+              </p>
+            </div>
+            <div class="painel">
+              <div class="painel-cabeca"><h3>Acima do limite</h3></div>
+              <p class="suave" style="font-size:13px">
+                Uma transferência acima do limite de aprovação da conta não sai
+                logo: fica pendente até um gerente a aprovar, e o valor já conta
+                como preso no saldo disponível.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-  </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
-  <script src="web/comum-banco.js?v=ea63aa24"></script>
-  <script src="transferir.js?v=e10e3664"></script>
+  <script src="web/comum-banco.js?v=833d295f"></script>
+  <script src="web/tema.js?v=80d06e5f"></script>
+  <script src="web/parcial.js?v=f5f52630"></script>
+  <script src="transferir.js?v=aad3c676"></script>
 </body>
 </html>

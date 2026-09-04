@@ -5,9 +5,6 @@
 // de controlo da referência é validado no servidor antes sequer de se ir
 // à base, por isso um engano na digitação é apanhado logo.
 
-const areaLogin = document.getElementById('area-login');
-const areaBoletos = document.getElementById('area-boletos');
-const navLogado = document.getElementById('nav-logado');
 const msgGeral = document.getElementById('msg-geral');
 
 let listaAtual = 'a_pagar';
@@ -19,16 +16,24 @@ function esc(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// Um boleto tem um estado a mais do que a tabela geral: "vencido" não é
+// um estado guardado, é um por_pagar cujo prazo já passou. Daí esta
+// função em vez do `badgeEstado` comum.
+//
+// Ícone e palavra em todos, nunca só a cor: quem não distingue verde de
+// vermelho tem de continuar a saber se pagou ou não.
 function badgeBoleto(estado, vencido) {
-  if (estado === 'por_pagar' && vencido) return '<span class="badge badge-rejeitada">Vencido</span>';
+  if (estado === 'por_pagar' && vencido) {
+    return '<span class="badge badge-vencido"><span class="icone i-info"></span>Vencido</span>';
+  }
   const mapa = {
-    por_pagar: ['badge-pendente', 'Por pagar'],
-    em_pagamento: ['badge-pendente', 'A aguardar aprovação'],
-    pago: ['badge-concluida', 'Pago'],
-    cancelado: ['badge-rejeitada', 'Cancelado'],
+    por_pagar:    ['badge-pendente',  'i-info',     'Por pagar'],
+    em_pagamento: ['badge-pendente',  'i-info',     'À espera de aprovação'],
+    pago:         ['badge-concluida', 'i-aprovado', 'Pago'],
+    cancelado:    ['badge-cancelado', 'i-info',     'Cancelado'],
   };
-  const [c, t] = mapa[estado] || ['badge-rejeitada', estado];
-  return `<span class="badge ${c}">${t}</span>`;
+  const [c, ic, t] = mapa[estado] || ['badge-rejeitada', 'i-info', estado];
+  return `<span class="badge ${c}"><span class="icone ${ic}"></span>${t}</span>`;
 }
 
 // ---- consultar antes de pagar ----------------------------------------
@@ -176,28 +181,9 @@ async function carregar() {
 async function verificarSessao() {
   const { data } = await sb.auth.getSession();
   if (!data.session) return;
-  areaLogin.hidden = true;
-  areaBoletos.hidden = false;
-  navLogado.hidden = false;
+  pcMostrarApp('Boletos');
   await carregar();
 }
 
-document.getElementById('form-login').addEventListener('submit', async (ev) => {
-  ev.preventDefault();
-  const { error } = await sb.auth.signInWithPassword({
-    email: document.getElementById('email').value,
-    password: document.getElementById('senha').value,
-  });
-  if (error) {
-    mostrarMsg(document.getElementById('msg-login'), 'Login inválido.', 'erro');
-    return;
-  }
-  await verificarSessao();
-});
-
-document.getElementById('btn-sair').addEventListener('click', async () => {
-  await sb.auth.signOut();
-  window.location.reload();
-});
-
+pcLigarEntrada(verificarSessao);
 verificarSessao();

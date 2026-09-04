@@ -4,72 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prepacoin — documento</title>
-  <link rel="stylesheet" href="web/estilos.css?v=9c21eddd" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=2c4f04e7" />
   <style>
-    /* O documento é uma folha A4 no ecrã e no papel. O PDF sai pelo
-       "Imprimir → Guardar como PDF" do próprio browser: evita carregar
-       uma biblioteca só para isto, e sai igual ao que se vê. */
-    body { background: #EDEEEF; }
-    .folha {
-      width: 210mm; min-height: 297mm;
-      margin: 24px auto; padding: 18mm;
-      background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,.15);
-    }
-    .doc-topo {
-      display: flex; justify-content: space-between; align-items: flex-end;
-      border-bottom: 3px solid var(--pc-roxo); padding-bottom: 10px; margin-bottom: 22px;
-    }
-    .doc-marca { font-size: 22px; font-weight: 800; color: var(--pc-roxo); letter-spacing: -.02em; }
-    .doc-id { font-size: 12px; color: var(--pc-secundario); font-family: "SFMono-Regular", Consolas, monospace; }
-    .doc-titulo { font-size: 15px; font-weight: 700; margin: 0 0 14px; }
-    table.doc { width: 100%; border-collapse: collapse; font-size: 12px; }
-    table.doc td { border: 1px solid var(--pc-roxo-claro); padding: 7px 9px; }
-    table.doc td.rot { background: #F6EFFC; font-weight: 700; width: 32%; }
+    /* A folha é uma A4 no ecrã e no papel, e o PDF sai pelo
+       "Imprimir → Guardar como PDF" do próprio browser: nenhuma
+       biblioteca, e o que se vê é o que sai.
 
-    .caixa-ref {
-      margin-top: 22px; border: 2px solid var(--pc-roxo-claro);
-      border-radius: 8px; padding: 16px;
-    }
-    .ref-grade { display: flex; gap: 28px; flex-wrap: wrap; }
-    .ref-rot { font-size: 10px; letter-spacing: .1em; color: var(--pc-secundario); text-transform: uppercase; }
-    .ref-val { font-size: 20px; font-weight: 800; letter-spacing: 2px; }
-    .ref-val.valor { color: var(--pc-laranja); }
-    .barras { display: flex; align-items: flex-end; height: 48px; margin-top: 14px; }
-    .barras i { display: block; height: 100%; }
-    .linha-digitos {
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 13px; letter-spacing: 3px; margin-top: 5px;
-    }
-
-    .linhas-fatura { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 18px; }
-    .linhas-fatura th {
-      text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .06em;
-      color: var(--pc-secundario); border-bottom: 2px solid var(--pc-borda); padding: 6px 4px;
-    }
-    .linhas-fatura td { padding: 7px 4px; border-bottom: 1px solid var(--pc-borda); }
-    .linhas-fatura .num { text-align: right; white-space: nowrap; }
-    .total-linha { font-weight: 800; font-size: 14px; }
-
-    .rodape-doc {
-      margin-top: 26px; font-size: 9px; color: var(--pc-secundario);
-      font-style: italic; border-top: 1px solid var(--pc-borda); padding-top: 10px;
-    }
-    .barra-acoes {
-      max-width: 210mm; margin: 24px auto 0; display: flex; gap: 10px;
-      justify-content: flex-end; padding: 0 8px;
-    }
-    @media print {
-      body { background: #fff; }
-      .barra-acoes, .nao-imprimir { display: none !important; }
-      .folha { margin: 0; box-shadow: none; width: auto; min-height: 0; padding: 0; }
-      @page { size: A4; margin: 16mm; }
-    }
+       A folha fica branca com tinta preta mesmo no tema escuro. Não é
+       esquecimento: um boleto impresso em fundo escuro gasta o toner
+       todo e sai ilegível. O tema é do ecrã, o papel é papel. */
+    body { background: var(--pc-chao-suave); }
   </style>
 </head>
 <body>
   <div class="barra-acoes nao-imprimir">
-    <a href="boletos.html" class="botao secundario" style="margin:0">← Voltar</a>
-    <button type="button" id="btn-imprimir" style="margin:0">Imprimir / Guardar PDF</button>
+    <a href="boletos.html" class="botao secundario">
+      <span class="icone i-seta-esquerda"></span>Voltar
+    </a>
+    <button type="button" id="btn-imprimir">
+      <span class="icone i-exportar"></span>Imprimir ou guardar PDF
+    </button>
   </div>
 
   <div class="folha" id="folha">
@@ -78,7 +35,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
-  <script src="web/comum-banco.js?v=ea63aa24"></script>
+  <script src="web/comum-banco.js?v=833d295f"></script>
   <script src="documento.js?v=4bf55ca3"></script>
 </body>
 </html>
