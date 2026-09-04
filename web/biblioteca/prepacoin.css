@@ -295,16 +295,36 @@ p { margin: 0 0 var(--pc-e3); }
   color: #FFFFFF;
 }
 
+/* ── a marca ──────────────────────────────────────────────────────
+   O chip lima é desenhado pelo CSS e a marca entra por `mask`, em vez
+   de vir um PNG inteiro com o lima cozido lá dentro. Duas razões:
+
+   1. O lima do ficheiro original é #E2FA56 e o token é #EBFF78. Lado a
+      lado nota-se, e dois limas no mesmo ecrã lê-se como erro. Assim há
+      um só, o do token, e mudar o token muda a marca com ele.
+   2. Sendo máscara, a marca segue a cor que se lhe der: escura sobre o
+      chip lima, ou lima sobre um fundo escuro, com o mesmo ficheiro.
+
+   O PNG traz a marca já posicionada dentro do quadrado como no
+   original (encostada à direita e ao fundo, de propósito), por isso
+   `inset: 0` reproduz a composição tal e qual. */
+.marca-pp {
+  position: relative;
+  background: var(--pc-lima);
+  flex-shrink: 0;
+}
+.marca-pp::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-color: var(--pc-tinta);
+  -webkit-mask: url(../marca/prepacoin-marca.png) center / contain no-repeat;
+  mask: url(../marca/prepacoin-marca.png) center / contain no-repeat;
+}
+
 .rail-marca {
   width: 40px; height: 40px;
   border-radius: var(--pc-r-controlo);
-  background: var(--pc-lima);
-  color: var(--pc-tinta);
-  display: grid; place-items: center;
-  font-family: 'Sora', sans-serif;
-  font-weight: 700; font-size: 15px;
   margin-bottom: var(--pc-e4);
-  flex-shrink: 0;
 }
 
 .rail a {
@@ -651,13 +671,8 @@ select {
 }
 .entrada-caixa { width: 100%; max-width: 380px; }
 .entrada-marca {
-  width: 52px; height: 52px;
+  width: 60px; height: 60px;
   border-radius: var(--pc-r-painel);
-  background: var(--pc-lima);
-  color: var(--pc-tinta);
-  display: grid; place-items: center;
-  font-family: 'Sora', sans-serif;
-  font-weight: 700; font-size: 19px;
   margin: 0 auto var(--pc-e4);
 }
 .entrada-caixa h1 { text-align: center; font-size: 24px; }
@@ -989,6 +1004,18 @@ body.em-janela { background: var(--pc-superficie); }
   display: flex; justify-content: space-between; align-items: flex-end;
   border-bottom: 2px solid #0A0C10;
   padding-bottom: 10px; margin-bottom: 22px;
+}
+.doc-marca-fila { display: flex; align-items: center; gap: 10px; }
+/* a marca a tinta, sem o chip lima: ver a nota em documento.js */
+.doc-simbolo {
+  width: 34px; height: 34px; flex-shrink: 0;
+  background-color: #0A0C10;
+  -webkit-mask: url(../marca/prepacoin-marca.png) center / contain no-repeat;
+  mask: url(../marca/prepacoin-marca.png) center / contain no-repeat;
+  /* o Chrome ignora `mask` ao imprimir em alguns casos; o
+     print-color-adjust obriga-o a manter o preenchimento */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 .doc-marca {
   font-family: 'Sora', sans-serif;

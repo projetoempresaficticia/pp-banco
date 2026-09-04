@@ -32,6 +32,31 @@ esteve (`#8F41DE`, `#FF7535`) já não é a do banco.
 A biblioteca está em `web/biblioteca/prepacoin.css` e a montra em
 [biblioteca.html](https://projetoempresaficticia.github.io/pp-banco/biblioteca.html).
 
+### A marca
+
+O ícone veio do Germano (2026-09-04) e está em `web/marca/`. O chip lima é
+desenhado pelo **CSS**, e só a marca escura vem do ficheiro, aplicada por
+`mask-image`. Duas razões, e as duas contam:
+
+1. **O lima do ficheiro original é `#E2FA56`; o token é `#EBFF78`.** Lado
+   a lado nota-se, e dois limas no mesmo ecrã lê-se como erro. Assim há um
+   só, o do token, e mudar o token muda a marca com ele. (A tinta do
+   ficheiro, `#0A0A0E`, difere 2/255 do token e é indistinguível.)
+2. **Sendo máscara, a marca segue a cor que se lhe der:** escura sobre o
+   chip lima, lima sobre fundo escuro, ou tinta sozinha no papel, tudo com
+   o mesmo ficheiro.
+
+`python ferramentas/gerar_marca.py` regenera tudo a partir do PNG
+original: a máscara, o ícone de 512, o `apple-touch-icon` e os favicons. É
+um script e não um recorte à mão porque o original tem 1270x1239 com
+transparência à volta e o chip lá dentro tem 1041x1014 — meter isso num
+`<img>` de 40x40 dava a marca esticada, que foi exatamente o que aconteceu
+com o ícone do Cartório.
+
+No papel a marca vai a tinta e **sem** o chip: um quadrado de cor sólida
+gasta toner e, numa impressora a preto, sai como uma mancha cinzenta por
+cima da própria marca.
+
 ### A regra que decide o resto
 
 O lima tem **1,10:1** de contraste sobre branco. Não é gosto, é medição:

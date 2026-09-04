@@ -48,11 +48,17 @@ function barras(digitos) {
 }
 
 function topo(titulo, id) {
+  // No papel a marca vai a tinta e sem o chip lima: um quadrado de cor
+  // sólida gasta toner e, numa impressora a preto, sai como uma mancha
+  // cinzenta por cima da própria marca. A forma sozinha lê-se melhor.
   return `
     <div class="doc-topo">
-      <div>
-        <div class="doc-marca">BANCO PREPACOIN</div>
-        <div class="ref-rot" style="margin-top:2px">Prepara Portugal</div>
+      <div class="doc-marca-fila">
+        <span class="doc-simbolo" aria-hidden="true"></span>
+        <div>
+          <div class="doc-marca">BANCO PREPACOIN</div>
+          <div class="ref-rot" style="margin-top:2px">Prepara Portugal</div>
+        </div>
       </div>
       <div class="doc-id">${esc(id)}</div>
     </div>

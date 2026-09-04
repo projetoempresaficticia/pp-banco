@@ -2,13 +2,17 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
-  <meta name="pc-versao" content="d2927667f248" />
+  <meta name="pc-versao" content="265f594c7edb" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prepacoin — Verificar comprovativo</title>
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="theme-color" content="#EBFF78" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
-  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=545f70fd" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=1d8aa32c" />
   <script src="web/atualizar.js?v=b807cf58"></script>
   <style>
     /* Esta página é pública: não leva rail nem sessão. Quem chega aqui
@@ -17,10 +21,7 @@
     .publica { max-width: 560px; margin: 0 auto; padding: var(--pc-e7) var(--pc-e4); }
     .publica-topo { text-align: center; margin-bottom: var(--pc-e6); }
     .publica-marca {
-      width: 52px; height: 52px; border-radius: var(--pc-r-painel);
-      background: var(--pc-lima); color: var(--pc-tinta);
-      display: grid; place-items: center;
-      font-family: 'Sora', sans-serif; font-weight: 700; font-size: 19px;
+      width: 60px; height: 60px; border-radius: var(--pc-r-painel);
       margin: 0 auto var(--pc-e4);
     }
     #codigo { text-transform: uppercase; letter-spacing: 3px; font-size: 16px; }
@@ -29,7 +30,7 @@
 <body>
   <div class="publica">
     <div class="publica-topo">
-      <div class="publica-marca" aria-hidden="true">P$</div>
+      <div class="marca-pp publica-marca" aria-hidden="true"></div>
       <h1>Verificar comprovativo</h1>
       <p class="suave" style="margin-top:var(--pc-e2)">
         Qualquer pessoa pode conferir um comprovativo aqui, sem entrar na conta.

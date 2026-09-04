@@ -31,7 +31,7 @@ function pcMontarRail(alvo) {
   alvo.className = 'rail';
   alvo.setAttribute('aria-label', 'Navegação principal');
   alvo.innerHTML =
-    '<div class="rail-marca" aria-hidden="true">P$</div>' +
+    '<div class="marca-pp rail-marca" aria-hidden="true"></div>' +
     PC_PAGINAS.map((p) => `
       <a href="${p.href}" title="${pcEscapar(p.nome)}"
          ${p.href === atual ? 'aria-current="page"' : ''}>

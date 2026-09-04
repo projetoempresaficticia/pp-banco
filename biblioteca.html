@@ -2,13 +2,17 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
-  <meta name="pc-versao" content="d2927667f248" />
+  <meta name="pc-versao" content="265f594c7edb" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prepacoin — biblioteca de design</title>
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="theme-color" content="#EBFF78" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
-  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=545f70fd" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=1d8aa32c" />
   <script src="web/atualizar.js?v=b807cf58"></script>
   <style>
     .secao { margin-bottom: var(--pc-e8); }
@@ -62,7 +66,7 @@
 <body>
   <div class="app">
     <nav class="rail" aria-label="Navegação principal">
-      <div class="rail-marca" aria-hidden="true">P$</div>
+      <div class="marca-pp rail-marca" aria-hidden="true"></div>
       <a href="index.html" title="A minha conta"><span class="icone icone-24 i-conta"></span><span class="so-leitores">A minha conta</span></a>
       <a href="transferir.html" title="Transferir"><span class="icone icone-24 i-transferir"></span><span class="so-leitores">Transferir</span></a>
       <a href="boletos.html" title="Boletos"><span class="icone icone-24 i-recibo"></span><span class="so-leitores">Boletos</span></a>
@@ -118,6 +122,49 @@
               Tinta sobre lima
               <span class="veredicto">17,81:1 · é assim que o lima entra</span>
             </div>
+          </div>
+        </section>
+
+        <!-- ══ marca ══ -->
+        <section class="secao">
+          <h2>Marca</h2>
+          <p class="suave">
+            O chip lima é desenhado pelo CSS e a marca entra por máscara.
+            Assim há um só lima em todo o produto, e a mesma forma serve
+            escura sobre lima ou lima sobre escuro.
+          </p>
+          <div class="painel">
+            <div class="amostras" style="gap:var(--pc-e5); align-items:flex-end">
+              <div class="centro">
+                <div class="marca-pp" style="width:96px;height:96px;border-radius:22px;margin-bottom:var(--pc-e2)"></div>
+                <div class="ajuda">96px</div>
+              </div>
+              <div class="centro">
+                <div class="marca-pp" style="width:60px;height:60px;border-radius:var(--pc-r-painel);margin-bottom:var(--pc-e2)"></div>
+                <div class="ajuda">60px, entrada</div>
+              </div>
+              <div class="centro">
+                <div class="marca-pp" style="width:40px;height:40px;border-radius:var(--pc-r-controlo);margin-bottom:var(--pc-e2)"></div>
+                <div class="ajuda">40px, rail</div>
+              </div>
+              <div class="centro">
+                <div style="width:96px;height:96px;background:var(--pc-tinta);border-radius:22px;display:grid;place-items:center;margin-bottom:var(--pc-e2)">
+                  <span class="doc-simbolo" style="width:62px;height:62px;background-color:var(--pc-lima)"></span>
+                </div>
+                <div class="ajuda">invertida</div>
+              </div>
+              <div class="centro">
+                <div style="width:96px;height:96px;background:#FFFFFF;border:1px solid var(--pc-linha);border-radius:22px;display:grid;place-items:center;margin-bottom:var(--pc-e2)">
+                  <span class="doc-simbolo" style="width:62px;height:62px"></span>
+                </div>
+                <div class="ajuda">no papel</div>
+              </div>
+            </div>
+            <p class="ajuda">
+              No papel a marca vai a tinta e sem o chip: um quadrado de cor
+              sólida gasta toner e, numa impressora a preto, sai como uma
+              mancha cinzenta por cima da própria marca.
+            </p>
           </div>
         </section>
 
