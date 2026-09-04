@@ -2,12 +2,14 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
+  <meta name="pc-versao" content="d2927667f248" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prepacoin — Emitir fatura</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
-  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=71f748f0" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=545f70fd" />
+  <script src="web/atualizar.js?v=b807cf58"></script>
   <style>
     .linha-item {
       display: grid; grid-template-columns: 1fr 90px 150px 44px;
@@ -90,9 +92,11 @@
               </div>
             </div>
 
-            <button type="submit" id="btn-emitir">
-              <span class="icone i-recibo"></span>Emitir fatura e boleto
-            </button>
+            <div class="acoes-fim">
+              <button type="submit" id="btn-emitir">
+                <span class="icone i-recibo"></span>Emitir fatura e boleto
+              </button>
+            </div>
             <p class="msg" id="msg-emitir"></p>
           </form>
         </div>

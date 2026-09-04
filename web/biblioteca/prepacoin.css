@@ -538,12 +538,19 @@ select {
 .ajuda { font-size: 12px; color: var(--pc-texto-suave); margin: var(--pc-e2) 0 0; }
 
 /* O botão que fecha um formulário precisa de se separar do último campo.
-   Colado logo a seguir ao input, lia-se como parte dele. */
+   Colado logo a seguir ao input, lia-se como parte dele.
+
+   Os números saíram de uma medição, não do olho: a primeira tentativa
+   deixou 57px entre a descrição e o botão, quando o espaço entre dois
+   campos normais deste mesmo formulário é 70px. A ação que FECHA o
+   formulário não pode estar mais apertada do que o intervalo entre dois
+   campos a meio dele. Agora dá 88px, claramente acima do ritmo do
+   formulário, que é o que faz o botão ler-se como outra coisa. */
 .acoes-fim {
   display: flex; gap: var(--pc-e2); flex-wrap: wrap;
-  margin-top: var(--pc-e6);
+  margin-top: var(--pc-e8);
   padding-top: var(--pc-e5);
-  border-top: 1px solid var(--pc-linha-suave);
+  border-top: 1px solid var(--pc-linha);
 }
 
 /* ───────────────────────────────────────────────────────────────────

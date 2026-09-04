@@ -456,6 +456,34 @@ gosto: durante os testes o browser serviu uma cópia velha do
 `formatarDataHora is not defined` que não aparecia em lado nenhum. Fazer
 isto à mão em 8 páginas por 5 ficheiros falha, e por isso é um script.
 
+### O buraco que o `?v=` não tapa
+
+O `?v=` protege o CSS e o JS. **Não protege o HTML**, que é a porta de
+entrada. O GitHub Pages manda `Cache-Control: max-age=600` no HTML e não
+deixa mudar isso: durante dez minutos o browser serve a página guardada
+sem sequer perguntar ao servidor. E como é o HTML que diz quais são os
+`?v=`, um HTML velho aponta para ficheiros velhos e a página inteira fica
+presa. O Germano viu a lista de boletos com o desenho antigo horas depois
+de ele ter sido substituído.
+
+`versoes.py` escreve por isso um `versao.json` e um
+`<meta name="pc-versao">` em cada página, ambos com o resumo de tudo o
+que está versionado. O `web/atualizar.js` compara os dois ao abrir a
+página (com `cache: 'no-store'`, que obriga a ir mesmo ao servidor) e, se
+não baterem certo, recarrega com a versão no endereço. Endereço diferente
+quer dizer entrada diferente na cache, por isso o browser vai buscar o
+HTML novo em vez de reusar o velho.
+
+Recarrega **no máximo uma vez por página e por versão**, guardado em
+`sessionStorage`, para nunca entrar em ciclo. Sem rede, segue com o que
+tem: mais vale a página velha do que página nenhuma.
+
+> Nota para quem mexer no `versoes.py`: o resumo do site exclui o próprio
+> `<meta>` **e o espaço em branco à frente dele**. Sem isso é circular
+> (escrever a versão muda o ficheiro, que muda a versão) e o script nunca
+> estabiliza. `python ferramentas/versoes.py --conferir` tem de devolver
+> 0 à segunda passagem.
+
 O `gerar_paginas.py` escreve `transferir`, `boletos`, `emitir` e
 `aprovacoes` a partir de um molde comum. O `index` e a `biblioteca` ficam
 de fora: o primeiro tem um painel de conta que não se parece com nenhum

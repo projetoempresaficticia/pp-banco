@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Reescreve os ?v= dos ficheiros locais com o sha1 do próprio ficheiro.
+"""Carimba as versões do Prepacoin.
 
-Porquê: durante os testes o browser serviu uma cópia velha do
-comum-banco.js e o comprovativo ficou preso em "A carregar…" com um
-`formatarDataHora is not defined` que não aparecia em lado nenhum. A
-solução é marcar cada ficheiro com o resumo do seu conteúdo, para o
-endereço mudar sempre que o conteúdo muda.
+Faz duas coisas, e as duas são necessárias:
 
-Fazer isso à mão em 8 páginas x 5 ficheiros falha. Este script trata de
-tudo. Aceita marcadores por preencher (?v=CSS, ?v=APP, ...) e resumos
-antigos, e substitui ambos.
+1. Reescreve os `?v=` dos ficheiros locais com o sha1 do próprio
+   ficheiro. Sem isto o browser serve uma cópia velha do JS ou do CSS.
+
+2. Escreve `versao.json` e o `<meta name="pc-versao">` de cada página,
+   com um resumo de TODOS os ficheiros versionados. Isto existe porque o
+   ponto 1 sozinho não chega: o GitHub Pages manda
+   `Cache-Control: max-age=600` no HTML e não deixa mudar isso, por isso
+   um HTML em cache continua a apontar para os `?v=` velhos e a página
+   fica presa dez minutos. O `web/atualizar.js` compara o meta com o
+   versao.json e recarrega quando não batem.
 
 Uso:
     python ferramentas/versoes.py            verifica e corrige
@@ -18,6 +21,7 @@ Uso:
 """
 
 import hashlib
+import json
 import pathlib
 import re
 import sys
@@ -26,6 +30,13 @@ RAIZ = pathlib.Path(__file__).resolve().parent.parent
 
 # só ficheiros locais: os CDN e as fontes não levam ?v=
 PADRAO = re.compile(r'(?P<attr>src|href)="(?P<ficheiro>(?!https?:)[^"?]+)\?v=(?P<versao>[^"]*)"')
+META = re.compile(r'<meta name="pc-versao" content="(?P<versao>[^"]*)"\s*/?>')
+# Para o cálculo do resumo, apagar o meta TEM de apagar também o espaço
+# em branco que ficaria antes dele. Sem isso, uma página que já tem o
+# meta reduz-se a um texto ligeiramente diferente da que ainda não tem
+# (sobra a mudança de linha e a indentação), o resumo muda de passagem
+# para passagem e o script nunca estabiliza.
+META_RESUMO = re.compile(r'\s*<meta name="pc-versao"[^>]*>')
 
 
 def resumo(caminho: pathlib.Path) -> str:
@@ -35,11 +46,13 @@ def resumo(caminho: pathlib.Path) -> str:
 def main() -> int:
     conferir = '--conferir' in sys.argv
     problemas = 0
-    alterados = []
+    paginas = sorted(RAIZ.glob('*.html'))
+    versionados = set()
 
-    for html in sorted(RAIZ.glob('*.html')):
+    # ── passo 1: os ?v= de cada ficheiro ──────────────────────────────
+    textos = {}
+    for html in paginas:
         texto = html.read_text(encoding='utf-8')
-        original = texto
 
         def troca(m: re.Match) -> str:
             nonlocal problemas
@@ -48,6 +61,7 @@ def main() -> int:
                 print(f'  FALTA    {html.name} -> {m.group("ficheiro")}')
                 problemas += 1
                 return m.group(0)
+            versionados.add(alvo)
             novo = resumo(alvo)
             if novo != m.group('versao'):
                 print(f'  {"desatualizado" if conferir else "corrigido"}'
@@ -55,18 +69,65 @@ def main() -> int:
                 problemas += 1
             return f'{m.group("attr")}="{m.group("ficheiro")}?v={novo}"'
 
-        texto = PADRAO.sub(troca, texto)
-        if texto != original and not conferir:
-            html.write_text(texto, encoding='utf-8')
-            alterados.append(html.name)
+        textos[html] = PADRAO.sub(troca, texto)
+
+    # ── passo 2: a versão do site inteiro ─────────────────────────────
+    # Resumo de todos os assets versionados MAIS o HTML já corrigido: se
+    # mudar uma vírgula em qualquer sítio, a versão muda e quem tiver a
+    # página velha em cache recarrega.
+    #
+    # O <meta> da versão sai do cálculo, senão isto era circular:
+    # escrever a versão no ficheiro mudava o ficheiro, que mudava a
+    # versão, que obrigava a reescrever, para sempre.
+    acumulador = hashlib.sha1()
+    for f in sorted(versionados):
+        acumulador.update(f.read_bytes())
+    for html in paginas:
+        acumulador.update(META_RESUMO.sub('', textos[html]).encode('utf-8'))
+    versao_site = acumulador.hexdigest()[:12]
+
+    for html in paginas:
+        texto = textos[html]
+        atual = META.search(texto)
+        if atual:
+            if atual.group('versao') != versao_site:
+                problemas += 1
+                texto = META.sub(
+                    f'<meta name="pc-versao" content="{versao_site}" />', texto, count=1)
+        else:
+            problemas += 1
+            print(f'  sem meta de versão: {html.name}')
+            texto = texto.replace(
+                '<meta name="viewport"',
+                f'<meta name="pc-versao" content="{versao_site}" />\n  <meta name="viewport"',
+                1)
+        textos[html] = texto
+
+    ficheiro_versao = RAIZ / 'versao.json'
+    conteudo = json.dumps({'versao': versao_site}, ensure_ascii=False) + '\n'
+    versao_gravada = None
+    if ficheiro_versao.is_file():
+        try:
+            versao_gravada = json.loads(ficheiro_versao.read_text(encoding='utf-8')).get('versao')
+        except ValueError:
+            pass
+
+    if not conferir:
+        for html in paginas:
+            html.write_text(textos[html], encoding='utf-8')
+        ficheiro_versao.write_text(conteudo, encoding='utf-8')
+
+    if versao_gravada != versao_site:
+        problemas += 1
+        print(f'  versão do site: {versao_gravada} -> {versao_site}')
 
     if problemas == 0:
-        print('Todas as versões batem certo.')
+        print(f'Tudo carimbado. Versão do site: {versao_site}')
         return 0
     if conferir:
         print(f'\n{problemas} por corrigir. Corra sem --conferir.')
         return 1
-    print(f'\n{len(alterados)} ficheiros atualizados.')
+    print(f'\nAtualizado. Versão do site: {versao_site}')
     return 0
 
 

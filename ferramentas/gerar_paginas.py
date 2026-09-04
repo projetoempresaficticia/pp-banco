@@ -232,9 +232,11 @@ escrever(
               </div>
             </div>
 
-            <button type="submit" id="btn-emitir">
-              <span class="icone i-recibo"></span>Emitir fatura e boleto
-            </button>
+            <div class="acoes-fim">
+              <button type="submit" id="btn-emitir">
+                <span class="icone i-recibo"></span>Emitir fatura e boleto
+              </button>
+            </div>
             <p class="msg" id="msg-emitir"></p>
           </form>
         </div>
