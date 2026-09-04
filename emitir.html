@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prepacoin — Emitir fatura</title>
+  <link rel="stylesheet" href="web/estilos.css?v=9c21eddd" />
+  <style>
+    .linha-item {
+      display: grid; grid-template-columns: 1fr 90px 140px 40px;
+      gap: 0.6rem; align-items: end; margin-bottom: 0.6rem;
+    }
+    .linha-item .remover {
+      background: none; border: 1px solid var(--pc-borda); color: var(--pc-erro);
+      margin: 0; padding: 0.5rem 0; border-radius: 8px; cursor: pointer;
+    }
+    .linha-item label { margin-top: 0; }
+    @media (max-width: 620px) {
+      .linha-item { grid-template-columns: 1fr 1fr; }
+    }
+    .total-caixa {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 2px solid var(--pc-borda); margin-top: 1rem; padding-top: 1rem;
+    }
+    .total-valor { font-size: 1.6rem; font-weight: 800; color: var(--pc-roxo); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="cabecalho-marca">
+      <div class="marca-moeda" aria-hidden="true">P$</div>
+      <strong>Prepacoin</strong>
+    </div>
+    <nav id="nav-logado" hidden>
+      <a href="index.html">A minha conta</a>
+      <a href="boletos.html">Boletos</a>
+      <a href="transferir.html">Transferir</a>
+      <button type="button" class="secundario" id="btn-sair" style="margin:0">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="area-login" class="painel" style="max-width:360px">
+      <h2>Entrar</h2>
+      <form id="form-login">
+        <label for="email">Email de login</label>
+        <input id="email" type="email" required />
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" required />
+        <button type="submit">Entrar</button>
+        <p class="msg" id="msg-login"></p>
+      </form>
+    </div>
+
+    <div id="area-emitir" hidden>
+      <h1>Emitir fatura</h1>
+      <p class="msg" style="color:var(--pc-secundario); margin-top:0">
+        A fatura diz o que está a cobrar; o boleto é a referência que o cliente
+        usa para pagar. Sai um do outro, automaticamente.
+      </p>
+
+      <form id="form-emitir" class="painel">
+        <label for="devedor">A quem vai faturar</label>
+        <select id="devedor" required></select>
+        <p class="msg" style="color:var(--pc-secundario)">
+          Só aparecem entidades com conta aberta no Prepacoin.
+        </p>
+
+        <label for="descricao">Descrição da fatura</label>
+        <input id="descricao" type="text" placeholder="Ex.: Encomenda de setembro" required />
+
+        <h2 style="margin-top:1.5rem">Itens</h2>
+        <div id="itens"></div>
+        <button type="button" class="secundario" id="btn-add-item" style="margin-top:0">+ Acrescentar item</button>
+
+        <div class="total-caixa">
+          <div>
+            <div class="cartao-rotulo" style="color:var(--pc-secundario)">Total</div>
+            <div class="total-valor" id="total">P$ 0,00</div>
+          </div>
+          <div>
+            <label for="dias" style="margin-top:0">Prazo (dias)</label>
+            <input id="dias" type="number" min="1" max="365" value="30" style="width:110px" />
+          </div>
+        </div>
+
+        <button type="submit" id="btn-emitir">
+          <img class="icone" src="web/icons/upload-01.svg" alt="" style="filter:brightness(0) invert(1)" />
+          Emitir fatura e boleto
+        </button>
+        <p class="msg" id="msg-emitir"></p>
+      </form>
+    </div>
+
+    <!-- resultado -->
+    <div id="area-resultado" class="painel" hidden>
+      <div class="selo selo-ok">
+        <div class="selo-icone"><img class="icone" src="web/icons/check-01.svg" alt="" /></div>
+        <div class="selo-titulo">Fatura emitida</div>
+        <div class="selo-subtitulo" id="r-sub">—</div>
+        <div class="selo-grade">
+          <div class="selo-campo"><div class="rotulo">Fatura</div><div class="valor" id="r-fatura">—</div></div>
+          <div class="selo-campo"><div class="rotulo">Total</div><div class="valor" id="r-total">—</div></div>
+          <div class="selo-campo"><div class="rotulo">Entidade</div><div class="valor" id="r-entidade">—</div></div>
+          <div class="selo-campo"><div class="rotulo">Referência</div><div class="valor" id="r-referencia">—</div></div>
+        </div>
+        <div class="fila" style="justify-content:center; margin-top:1.5rem">
+          <a id="r-boleto-link" class="botao" href="#" target="_blank" rel="noopener">Ver / imprimir boleto</a>
+          <a class="botao secundario" href="boletos.html">Ver boletos</a>
+          <button type="button" class="secundario" id="btn-nova">Emitir outra</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="area-sem-empresa" class="painel" hidden>
+      <p class="msg">Só quem representa uma empresa pode emitir faturas.</p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
+  <script src="web/comum-banco.js?v=ea63aa24"></script>
+  <script src="emitir.js?v=32be1ce0"></script>
+</body>
+</html>

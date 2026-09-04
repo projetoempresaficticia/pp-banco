@@ -18,6 +18,14 @@ function paraCentimos(texto) {
   return Math.round(parseFloat(limpo) * 100);
 }
 
+function formatarDataHora(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('pt-PT', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
 function formatarIban(iban) {
   if (!iban) return '—';
   return iban.replace(/(.{4})/g, '$1 ').trim();

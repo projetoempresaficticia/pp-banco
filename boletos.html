@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prepacoin — Boletos</title>
+  <link rel="stylesheet" href="web/estilos.css?v=9c21eddd" />
+  <style>
+    .abas { display: flex; gap: 4px; border-bottom: 1px solid var(--pc-borda); margin-bottom: 1.5rem; }
+    .aba {
+      background: none; border: none; margin: 0;
+      padding: 0.7rem 1.1rem; cursor: pointer;
+      font-size: 0.92rem; font-weight: 600; color: var(--pc-secundario);
+      border-bottom: 2px solid transparent; border-radius: 0;
+    }
+    .aba:hover { background: var(--pc-fundo-suave); color: var(--pc-texto); }
+    .aba[aria-selected="true"] { color: var(--pc-roxo); border-bottom-color: var(--pc-roxo); }
+    .campos-ref { display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; }
+    .campos-ref .entidade { max-width: 130px; }
+    .campos-ref .referencia { max-width: 220px; }
+    input.ref {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 1.05rem; letter-spacing: 2px;
+    }
+    .linha-mb {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.85rem; color: var(--pc-roxo); letter-spacing: 1px;
+    }
+    .vencido { color: var(--pc-erro); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="cabecalho-marca">
+      <div class="marca-moeda" aria-hidden="true">P$</div>
+      <strong>Prepacoin</strong>
+    </div>
+    <nav id="nav-logado" hidden>
+      <a href="index.html">A minha conta</a>
+      <a href="transferir.html">Transferir</a>
+      <a href="emitir.html">Emitir fatura</a>
+      <a href="aprovacoes.html">Aprovações</a>
+      <button type="button" class="secundario" id="btn-sair" style="margin:0">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="area-login" class="painel" style="max-width:360px">
+      <h2>Entrar</h2>
+      <form id="form-login">
+        <label for="email">Email de login</label>
+        <input id="email" type="email" required />
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" required />
+        <button type="submit">Entrar</button>
+        <p class="msg" id="msg-login"></p>
+      </form>
+    </div>
+
+    <div id="area-boletos" hidden>
+      <h1>Boletos</h1>
+
+      <!-- pagar por referência, como num homebanking -->
+      <div class="painel">
+        <h2>Pagar um boleto</h2>
+        <p class="msg" style="color:var(--pc-secundario); margin-top:0">
+          Escreva a entidade e a referência que constam do boleto. Confirma-se
+          antes de pagar.
+        </p>
+        <form id="form-consultar" class="campos-ref">
+          <div class="entidade">
+            <label for="entidade">Entidade</label>
+            <input id="entidade" class="ref" inputmode="numeric" maxlength="5" placeholder="20007" required />
+          </div>
+          <div class="referencia">
+            <label for="referencia">Referência</label>
+            <input id="referencia" class="ref" inputmode="numeric" maxlength="11" placeholder="264 347 558" required />
+          </div>
+          <button type="submit" style="margin:0">Consultar</button>
+        </form>
+        <p class="msg" id="msg-consulta"></p>
+
+        <!-- o que se vai pagar, antes de confirmar -->
+        <div id="painel-confirmar" class="painel" style="margin-top:1.25rem; background:var(--pc-fundo-suave)" hidden>
+          <h3 style="margin-top:0" id="c-emitente">—</h3>
+          <div id="c-detalhe" class="msg" style="margin-top:0"></div>
+          <div id="c-linhas" style="margin-top:0.75rem"></div>
+          <div class="topo-pagina" style="margin:1rem 0 0">
+            <div>
+              <div class="cartao-rotulo" style="color:var(--pc-secundario)">Total a pagar</div>
+              <div style="font-size:1.5rem; font-weight:800" id="c-valor">—</div>
+            </div>
+            <div class="fila">
+              <button type="button" class="secundario" id="btn-cancelar-pag" style="margin:0">Desistir</button>
+              <button type="button" id="btn-confirmar-pag" style="margin:0">Confirmar pagamento</button>
+            </div>
+          </div>
+          <p class="msg" id="msg-pagamento"></p>
+        </div>
+      </div>
+
+      <div class="abas" role="tablist">
+        <button class="aba" role="tab" aria-selected="true" data-lista="a_pagar">A pagar</button>
+        <button class="aba" role="tab" aria-selected="false" data-lista="emitidos">Emitidos por mim</button>
+      </div>
+
+      <div class="painel">
+        <div id="lista-boletos"><p class="vazio">A carregar…</p></div>
+      </div>
+
+      <p class="msg" id="msg-geral"></p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
+  <script src="web/comum-banco.js?v=ea63aa24"></script>
+  <script src="boletos.js?v=4e95bb26"></script>
+</body>
+</html>

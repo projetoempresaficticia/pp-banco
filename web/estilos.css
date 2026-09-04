@@ -140,7 +140,12 @@ button.perigo:hover { background: #fdf2f2; }
   gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--pc-borda);
 }
 .movimento:last-child { border-bottom: none; }
-.mov-categoria { font-weight: 600; font-size: 0.92rem; text-transform: capitalize; }
+/* Só a primeira letra, não todas as palavras: esta classe serve tanto a
+   categoria ("salario") como a descrição livre de um boleto, e o
+   `capitalize` escrevia "Encomenda De Pao De Setembro" — em português as
+   preposições não levam maiúscula. */
+.mov-categoria { font-weight: 600; font-size: 0.92rem; }
+.mov-categoria::first-letter { text-transform: uppercase; }
 .mov-detalhe { font-size: 0.78rem; color: var(--pc-secundario); margin-top: 0.15rem; }
 .mov-valor { font-weight: 700; font-size: 0.98rem; white-space: nowrap; }
 .mov-valor.entrada { color: var(--pc-ok); }
