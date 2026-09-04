@@ -119,6 +119,54 @@ Duas notas de desenho:
   isso um erro no banco desfaz só essa parte e a pessoa fica registada na
   mesma — com `aviso_banco` na resposta a dizer o que falhou.
 
+## Faturas e boletos
+
+`sql/0005_faturas_e_boletos.sql` — decisão do Germano (2026-09-04).
+
+**O problema que resolve.** Pagar uma taxa a um órgão era: descobrir o
+IBAN do órgão, transferir o valor certo ao cêntimo, copiar o **UUID** da
+transação e colá-lo no formulário. Funciona, mas com ~1000 formandos é um
+gerador de erros — e não ensina nada, porque na vida real ninguém copia
+identificadores internos entre sites.
+
+**O modelo.** Duas coisas ligadas, para **qualquer entidade cobrar de
+qualquer outra** — órgão a empresa, empresa a empresa:
+
+| | O que é |
+|---|---|
+| **Fatura** `FT-2026-000001` | diz o quê e quanto: linhas, valor, quem emitiu, quem deve |
+| **Boleto** `BOL-2026-000001` | a ordem de pagamento gerada a partir dela: referência, valor, prazo |
+
+Vive no Prepacoin porque é o banco que recebe pagamentos. Os outros apps
+emitem por aqui e só perguntam se já foi pago.
+
+**RPCs:** `banco_emitir_fatura` (em nome da minha empresa),
+`banco_emitir_fatura_interna` (para os órgãos, que não têm funcionários —
+revogada de `PUBLIC`), `banco_pagar_boleto`, `banco_boletos_por_pagar`,
+`banco_verificar_fatura` (pública).
+
+**O que ganhou de graça:** `banco_pagar_boleto` reaproveita
+`banco_transferir`, logo herda o dono da conta, o saldo disponível a
+descontar pendentes, e o **limite de aprovação**. Um boleto acima de
+P$ 1 000 fica `em_pagamento` até um gerente aprovar — que é o
+comportamento certo para uma despesa grande. `banco_decidir_pendente`
+passou a fechar o boleto e liquidar a fatura quando aprova (e a devolvê-lo
+a `por_pagar` quando rejeita); sem isso ficaria eternamente pendurado.
+
+**A tabela `faturas` que já existia** (vazia, de uma sessão antiga) era só
+para as utilities e **não tinha quem emite** — não representava "a Padaria
+faturou ao Restaurante". Foi reconstruída, mantendo `servico` e `ciclo`
+para o pp-utilities os usar depois.
+
+Testado com sessões reais, incluindo o caso empresa→empresa que é a regra
+de ouro do projeto: o Moinho faturou farinha à Padaria (4×P$ 25 +
+P$ 10 de transporte = P$ 110, somado pelo servidor), a Padaria viu o
+boleto no ecrã "por pagar" — sem IBAN nem UUID — e pagou num clique.
+Mais: pagar duas vezes é recusado, pagar boleto de outra entidade é
+recusado, um boleto de P$ 1 500 ficou à espera de aprovação e fechou
+sozinho quando o gerente aprovou, e a fatura é verificável publicamente
+com as linhas discriminadas.
+
 ## Regras de negócio
 
 - **Dinheiro em cêntimos de P$ (`bigint`)**, nunca vírgula flutuante.
