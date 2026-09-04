@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
-  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=2c4f04e7" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=71f748f0" />
   <style>
     .campos-ref { display: flex; gap: var(--pc-e3); align-items: flex-end; flex-wrap: wrap; }
     .campos-ref .entidade { max-width: 130px; }
@@ -19,7 +19,7 @@
 <body>
 
   <!-- entrada: quem chega aqui sem sessão entra e fica nesta página -->
-  <div id="area-login" class="entrada">
+  <div id="area-login" class="ecra-entrada">
     <div class="entrada-caixa">
       <div class="entrada-marca" aria-hidden="true">P$</div>
       <h1>Prepacoin</h1>
@@ -48,10 +48,22 @@
               Pague escrevendo a entidade e a referência, como num homebanking.
             </p>
           </div>
-          <a href="emitir.html" class="botao">
-            <span class="icone i-mais"></span>Emitir fatura
-          </a>
+          <div class="fila">
+            <a href="emitir.html" class="botao secundario">
+              <span class="icone i-cartao"></span>Emitir fatura
+            </a>
+            <button type="button" id="btn-emitir-boleto">
+              <span class="icone i-recibo"></span>Emitir boleto
+            </button>
+          </div>
         </div>
+
+        <p class="suave" style="font-size:13px; margin:-8px 0 var(--pc-e5)">
+          Uma <strong>fatura</strong> discrimina o que está a cobrar, item a
+          item, e gera o boleto. Um <strong>boleto</strong> é a ordem de
+          pagamento: entidade, referência, valor e prazo. Para cobrar uma taxa
+          ou um acerto não é preciso fatura nenhuma.
+        </p>
 
         <div class="painel">
           <div class="painel-cabeca"><h3>Pagar um boleto</h3></div>
@@ -113,7 +125,7 @@
   <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
   <script src="web/comum-banco.js?v=833d295f"></script>
   <script src="web/tema.js?v=80d06e5f"></script>
-  <script src="web/parcial.js?v=f5f52630"></script>
-  <script src="boletos.js?v=ded8f974"></script>
+  <script src="web/parcial.js?v=92dd8a3c"></script>
+  <script src="boletos.js?v=07bdd4c5"></script>
 </body>
 </html>

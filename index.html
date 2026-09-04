@@ -7,12 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
-  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=2c4f04e7" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=71f748f0" />
 </head>
 <body>
 
   <!-- ══════════ entrada ══════════ -->
-  <div id="area-login" class="entrada">
+  <div id="area-login" class="ecra-entrada">
     <div class="entrada-caixa">
       <div class="entrada-marca" aria-hidden="true">P$</div>
       <h1>Prepacoin</h1>
@@ -87,7 +87,7 @@
             <div class="painel">
               <div class="painel-cabeca">
                 <h3>Por pagar</h3>
-                <a href="boletos.html" class="fantasma">Ver todos</a>
+                <a href="boletos.html" class="botao secundario">Ver todos</a>
               </div>
               <div id="c-boletos"><p class="vazio">A carregar…</p></div>
             </div>
@@ -96,9 +96,14 @@
           <div class="painel">
             <div class="painel-cabeca">
               <h3>Movimentos</h3>
-              <a href="emitir.html" class="fantasma">
-                <span class="icone icone-16 i-mais"></span>Emitir fatura
-              </a>
+              <div class="fila">
+                <a href="emitir.html" class="botao secundario">
+                  <span class="icone icone-16 i-cartao"></span>Emitir fatura
+                </a>
+                <a href="boletos.html" class="botao secundario">
+                  <span class="icone icone-16 i-recibo"></span>Emitir boleto
+                </a>
+              </div>
             </div>
             <div id="lista-movimentos"><p class="vazio">A carregar…</p></div>
           </div>
@@ -123,7 +128,7 @@
   <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
   <script src="web/comum-banco.js?v=833d295f"></script>
   <script src="web/tema.js?v=80d06e5f"></script>
-  <script src="web/parcial.js?v=f5f52630"></script>
-  <script src="app.js?v=dc558b23"></script>
+  <script src="web/parcial.js?v=92dd8a3c"></script>
+  <script src="app.js?v=3d38596e"></script>
 </body>
 </html>

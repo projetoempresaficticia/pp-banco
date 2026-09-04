@@ -537,6 +537,15 @@ select {
 
 .ajuda { font-size: 12px; color: var(--pc-texto-suave); margin: var(--pc-e2) 0 0; }
 
+/* O botão que fecha um formulário precisa de se separar do último campo.
+   Colado logo a seguir ao input, lia-se como parte dele. */
+.acoes-fim {
+  display: flex; gap: var(--pc-e2); flex-wrap: wrap;
+  margin-top: var(--pc-e6);
+  padding-top: var(--pc-e5);
+  border-top: 1px solid var(--pc-linha-suave);
+}
+
 /* ───────────────────────────────────────────────────────────────────
    8. PAINÉIS
    ─────────────────────────────────────────────────────────────────── */
@@ -620,7 +629,13 @@ select {
    entra ali e fica ali, em vez de ser atirado para o index.
    ─────────────────────────────────────────────────────────────────── */
 
-.entrada {
+/* `.ecra-entrada`, e não `.entrada`: a classe curta colidia com o
+   `.entrada` dos movimentos de crédito (`.mov-valor.entrada`), e o
+   `min-height: 100svh` daqui era aplicado a cada célula de entrada do
+   extrato. Resultado: linhas de 570px numa tabela cujo conteúdo tinha
+   40px. Duas regras diferentes a acertar no mesmo elemento, cada uma
+   sem saber da outra. */
+.ecra-entrada {
   min-height: 100svh;
   display: grid;
   place-items: center;
@@ -785,6 +800,66 @@ select {
   color: var(--pc-texto-suave); margin-bottom: 3px;
 }
 .selo-campo .valor { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ───────────────────────────────────────────────────────────────────
+   13b. JANELA (modal)
+   Usa o <dialog> nativo, não uma div com z-index: o browser trata
+   sozinho do foco preso lá dentro, do Escape a fechar e do resto da
+   página ficar inerte. Reescrever isso à mão dá sempre pior.
+   ─────────────────────────────────────────────────────────────────── */
+
+dialog.janela {
+  width: min(920px, calc(100vw - var(--pc-e6)));
+  max-height: calc(100svh - var(--pc-e6));
+  padding: 0;
+  border: 1px solid var(--pc-linha);
+  border-radius: var(--pc-r-painel);
+  background: var(--pc-superficie);
+  color: var(--pc-texto);
+  box-shadow: var(--pc-sombra-alta);
+  overflow: hidden;
+}
+dialog.janela::backdrop { background: rgba(10, 12, 16, .55); }
+
+.janela-cabeca {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--pc-e3);
+  padding: var(--pc-e4) var(--pc-e5);
+  border-bottom: 1px solid var(--pc-linha);
+  background: var(--pc-superficie);
+}
+.janela-cabeca h2 { margin: 0; }
+.janela-corpo {
+  padding: var(--pc-e5);
+  overflow: auto;
+  max-height: calc(100svh - 190px);
+}
+.janela-pe {
+  display: flex; justify-content: flex-end; gap: var(--pc-e2);
+  padding: var(--pc-e4) var(--pc-e5);
+  border-top: 1px solid var(--pc-linha);
+}
+/* Quando a janela mostra um documento, quem rola é o iframe e mais
+   ninguém: duas barras de scroll encaixadas uma na outra são das
+   coisas mais desagradáveis de usar. */
+.janela-corpo.so-documento { overflow: hidden; padding: 0; }
+
+/* a folha A4 dentro da janela encolhe para caber, sem deixar de ser A4 */
+.janela .folha, body.em-janela .folha {
+  width: 100%; min-height: 0;
+  margin: 0; padding: var(--pc-e5);
+  box-shadow: none;
+  border-radius: 0;
+}
+body.em-janela { background: var(--pc-superficie); }
+
+@media (max-width: 720px) {
+  dialog.janela {
+    width: 100vw; max-width: 100vw; max-height: 100svh;
+    height: 100svh; border-radius: 0; border: none;
+  }
+  .janela-corpo { max-height: calc(100svh - 170px); }
+}
 
 /* ───────────────────────────────────────────────────────────────────
    14. GRÁFICOS

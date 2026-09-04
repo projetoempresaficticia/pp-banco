@@ -28,7 +28,7 @@ CABECA = '''<!DOCTYPE html>
 <body>
 
   <!-- entrada: quem chega aqui sem sessão entra e fica nesta página -->
-  <div id="area-login" class="entrada">
+  <div id="area-login" class="ecra-entrada">
     <div class="entrada-caixa">
       <div class="entrada-marca" aria-hidden="true">P$</div>
       <h1>Prepacoin</h1>

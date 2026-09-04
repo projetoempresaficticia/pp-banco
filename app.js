@@ -278,31 +278,57 @@ async function carregarMovimentos() {
     return;
   }
 
-  alvo.innerHTML = movimentos.map((m) => {
-    const entrada = m.sentido === 'entrada';
-    const classeValor = m.estado === 'rejeitada' ? 'anulado' : entrada ? 'entrada' : 'saida';
-    const contraparte = m.contraparte === 'emissão'
-      ? 'emissão do banco' : formatarIban(m.contraparte);
-    return `
-      <div class="movimento">
-        <div class="mov-marca">
-          <span class="icone ${entrada ? 'i-seta-baixo' : 'i-seta-cima'}"></span>
-        </div>
-        <div>
-          <div class="mov-categoria">
-            ${esc(m.categoria || 'transferência')} ${badgeEstado(m.estado)}
-          </div>
-          <div class="mov-detalhe">
-            ${m.descricao ? esc(m.descricao) + ' · ' : ''}${entrada ? 'de' : 'para'} ${esc(contraparte)}
-            · ${formatarData(m.criada_em)}
-            ${m.codigo_auth ? `· <span class="codigo-auth">${esc(m.codigo_auth)}</span>` : ''}
-          </div>
-        </div>
-        <div class="mov-valor ${classeValor} numero">
-          ${entrada ? '+' : '-'} ${formatarP$(m.valor)}
-        </div>
-      </div>`;
-  }).join('');
+  // Lista em tabela, não em cartões: o Germano pediu-a assim, e com
+  // razão. Um extrato lê-se a comparar linha com linha, e para isso as
+  // colunas têm de alinhar. Os valores vão a tabular-nums para as casas
+  // decimais ficarem umas por cima das outras.
+  alvo.innerHTML = `
+    <div class="rolavel">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Movimento</th>
+            <th>Contraparte</th>
+            <th>Data</th>
+            <th>Estado</th>
+            <th class="num">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${movimentos.map((m) => {
+            const entrada = m.sentido === 'entrada';
+            const classeValor = m.estado === 'rejeitada'
+              ? 'anulado' : entrada ? 'entrada' : 'saida';
+            const contraparte = m.contraparte === 'emissão'
+              ? 'emissão do banco' : formatarIban(m.contraparte);
+            return `
+              <tr>
+                <td style="width:1%">
+                  <span class="icone ${entrada ? 'i-seta-baixo' : 'i-seta-cima'}"
+                        style="color:${entrada ? 'var(--pc-ok)' : 'var(--pc-texto-suave)'}"></span>
+                  <span class="so-leitores">${entrada ? 'Entrada' : 'Saída'}</span>
+                </td>
+                <td>
+                  <div class="mov-categoria">${esc(m.categoria || 'transferência')}</div>
+                  ${m.descricao ? `<div class="mov-detalhe">${esc(m.descricao)}</div>` : ''}
+                </td>
+                <td>
+                  ${esc(contraparte)}
+                  ${m.codigo_auth
+                    ? `<div class="mov-detalhe"><span class="codigo-auth">${esc(m.codigo_auth)}</span></div>`
+                    : ''}
+                </td>
+                <td>${formatarData(m.criada_em)}</td>
+                <td>${badgeEstado(m.estado)}</td>
+                <td class="num mov-valor ${classeValor}">
+                  ${entrada ? '+' : '-'} ${formatarP$(m.valor)}
+                </td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
 }
 
 // Saldo em tempo real, em vez de recarregar a página.

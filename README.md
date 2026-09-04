@@ -384,6 +384,63 @@ ser atirado para o index). O rail e a barra são montados por
   REST do Figma numa só chamada. Pintados por `mask-image`, seguem o
   `currentColor` e trocam de tema sozinhos.
 
+## Fatura e boleto são coisas diferentes
+
+`sql/0010_boleto_avulso.sql` — correção de conceito pedida pelo Germano
+(2026-09-04). Estavam colados: a única forma de criar um boleto era
+emitir uma fatura com linhas.
+
+| | O que é | Quando se usa |
+|---|---|---|
+| **Fatura** | Diz o quê e quanto, item a item. O documento comercial. | 20 pães a 1,50 e 12 bolos a 0,85 |
+| **Boleto** | A ordem de pagamento: entidade, referência, valor, prazo. | Sempre. Sai de uma fatura, ou sozinho |
+
+Uma fatura gera sempre um boleto. Um boleto **não** precisa de fatura:
+uma taxa, uma quota ou um acerto é só um valor a pagar até uma data, e
+obrigar a discriminar linhas para cobrar P$ 15 é papelada a mais. Daí o
+`banco_emitir_boleto`, e o botão "Emitir boleto" na página dos boletos.
+
+**Sem ilusões sobre a implementação:** o boleto avulso continua pendurado
+numa linha de `faturas`, porque é aí que vive o rasto de quem cobrou a
+quem e se foi pago. O que muda é que essa linha fica marcada com
+`servico = 'boleto_avulso'`, e a partir daí os ecrãs e o papel dizem a
+verdade sobre o que estão a mostrar: a lista escreve "Boleto avulso" em
+vez de "Fatura FT-…", e o documento impresso sai com o cabeçalho
+"Boleto de cobrança".
+
+## A colisão de `.entrada`
+
+Vale a pena guardar, porque não deu erro nenhum e custou a encontrar.
+
+As linhas de crédito do extrato usam `.mov-valor.entrada` desde sempre.
+Ao escrever a biblioteca, o ecrã de login ficou com a classe `.entrada`,
+que traz `min-height: 100svh`. Duas regras diferentes, cada uma sem saber
+da outra, a acertar no mesmo `<td>`: cada célula de entrada do extrato
+passou a medir uma altura de ecrã inteira, e a tabela ficou com linhas de
+570px para conteúdo de 40px.
+
+O que despistou: esvaziar as células **não mudava nada**, porque a altura
+não vinha do conteúdo. Só medindo caso a caso é que apareceu, e o
+culpado foi o nome curto demais. O ecrã de login passou a `.ecra-entrada`.
+
+**Regra:** uma classe de layout global nunca deve ter um nome que uma
+classe de dados possa querer. Se `.entrada` descreve um movimento
+bancário neste projeto, não pode descrever também um ecrã.
+
+## Documentos em janela, não em aba nova
+
+Ver um boleto abria `documento.html` noutra aba e obrigava a sair da
+página e a voltar. Passa a abrir numa janela por cima, com o `<dialog>`
+nativo: o browser trata sozinho do foco preso lá dentro, do Escape a
+fechar e de tornar o resto da página inerte.
+
+A janela carrega o `documento.html` num `<iframe>`, de propósito. Assim
+há **um só sítio** a desenhar o boleto, e o que se imprime é exatamente o
+que se vê. Um segundo desenho só para a janela ficava dessincronizado à
+primeira correção que alguém fizesse. Dentro da janela o documento
+esconde a sua própria barra de ações, para não haver dois pares de
+"Voltar / Imprimir" ao mesmo tempo.
+
 ## Ferramentas
 
 ```sh

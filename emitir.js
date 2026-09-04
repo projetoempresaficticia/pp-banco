@@ -137,8 +137,11 @@ function mostrarResultado(d) {
   document.getElementById('r-entidade').innerHTML = `<span class="codigo-auth">${esc(d.entidade)}</span>`;
   document.getElementById('r-referencia').innerHTML =
     `<span class="codigo-auth">${esc(d.referencia.slice(0,3))} ${esc(d.referencia.slice(3,6))} ${esc(d.referencia.slice(6,9))}</span>`;
-  document.getElementById('r-boleto-link').href =
-    'documento.html?boleto=' + encodeURIComponent(d.entidade + '-' + d.referencia);
+
+  // o boleto abre numa janela por cima, não noutra aba: quem acabou de
+  // emitir quer confirmar o papel e continuar aqui
+  document.getElementById('btn-ver-boleto').onclick = () =>
+    pcAbrirDocumento({ boleto: d.entidade + '-' + d.referencia });
 }
 
 document.getElementById('btn-nova').addEventListener('click', () => {

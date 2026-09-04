@@ -10,7 +10,18 @@
 
 const folha = document.getElementById('folha');
 
-document.getElementById('btn-imprimir').addEventListener('click', () => window.print());
+// Quando esta página é aberta dentro da janela de outra (num iframe),
+// esconde a sua própria barra: quem manda são os botões da janela, e
+// dois pares de "Voltar / Imprimir" ao mesmo tempo confundem.
+const dentroDeJanela = window.self !== window.top;
+if (dentroDeJanela) {
+  const barra = document.querySelector('.barra-acoes');
+  if (barra) barra.hidden = true;
+  document.body.classList.add('em-janela');
+} else {
+  document.getElementById('btn-imprimir')
+    .addEventListener('click', () => window.print());
+}
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -99,8 +110,19 @@ async function mostrarBoleto(entidade, referencia) {
   const d = r.dados;
 
   const dig = d.entidade + d.referencia;
+
+  // Fatura e boleto são coisas diferentes, e o papel tem de dizer qual
+  // é qual. Um boleto avulso não tem fatura discriminada por trás, e
+  // imprimir "Fatura FT-…" no cabeçalho dele seria mentira.
+  const titulo = d.avulso
+    ? 'Boleto de cobrança'
+    : 'Referência para pagamento de serviços';
+  const identificador = d.avulso
+    ? 'Boleto ' + esc(d.entidade) + '/' + esc(d.referencia)
+    : 'Fatura ' + (d.fatura || '');
+
   folha.innerHTML =
-    topo('Referência para pagamento de serviços', 'Fatura ' + (d.fatura || '')) +
+    topo(titulo, identificador) +
     `<table class="doc">
       ${linhaTab('Emitente', `${esc(d.emitente)} · ${esc(d.emitente_cedula)}`)}
       ${linhaTab('A cargo de', `${esc(d.devedor)} · ${esc(d.devedor_cedula)}`)}
@@ -131,7 +153,7 @@ async function mostrarBoleto(entidade, referencia) {
       <div class="linha-digitos">${esc(d.entidade)}&nbsp;&nbsp;${esc(d.referencia)}</div>
     </div>
 
-    ${tabelaLinhas(d.linhas, d.valor)}
+    ${d.avulso ? '' : tabelaLinhas(d.linhas, d.valor)}
     ${RODAPE}`;
 }
 

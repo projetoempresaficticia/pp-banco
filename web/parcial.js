@@ -113,6 +113,97 @@ function pcMostrarApp(titulo, antesDeSair) {
   pcMostrarQuem();
 }
 
+/* ── janela ────────────────────────────────────────────────────────
+   Ver um boleto ou um comprovativo abria uma aba nova, e obrigava a
+   sair da página e a voltar. Passa a abrir aqui por cima, com o
+   <dialog> nativo: o browser trata do foco preso lá dentro, do Escape
+   a fechar e de tornar o resto da página inerte.
+
+   O documento em si continua a viver em `documento.html`, e a janela
+   carrega-o num <iframe>. É de propósito: assim há UM só sítio a
+   desenhar o boleto, e o que se imprime é exatamente o que se vê. Um
+   segundo desenho só para a janela ficava dessincronizado à primeira
+   correção que alguém fizesse.
+   ────────────────────────────────────────────────────────────────── */
+
+function pcJanela() {
+  let d = document.getElementById('pc-janela');
+  if (d) return d;
+
+  d = document.createElement('dialog');
+  d.id = 'pc-janela';
+  d.className = 'janela';
+  d.innerHTML = `
+    <div class="janela-cabeca">
+      <h2 id="pc-janela-titulo">Documento</h2>
+      <button type="button" class="botao-icone" id="pc-janela-fechar" title="Fechar">
+        <span class="so-leitores">Fechar</span>
+        <span aria-hidden="true" style="font-size:20px; line-height:1">&times;</span>
+      </button>
+    </div>
+    <div class="janela-corpo" id="pc-janela-corpo"></div>
+    <div class="janela-pe" id="pc-janela-pe"></div>`;
+  document.body.appendChild(d);
+
+  d.querySelector('#pc-janela-fechar').addEventListener('click', () => d.close());
+  // clicar no escuro à volta também fecha
+  d.addEventListener('click', (ev) => { if (ev.target === d) d.close(); });
+  // largar o iframe ao fechar, para não ficar a consumir nada
+  d.addEventListener('close', () => {
+    const corpo = document.getElementById('pc-janela-corpo');
+    corpo.classList.remove('so-documento');
+    corpo.innerHTML = '';
+  });
+  return d;
+}
+
+// Abre `documento.html` numa janela por cima da página.
+//   pcAbrirDocumento({ boleto: '20009-937456155' })
+//   pcAbrirDocumento({ comprovante: 'FT-2026-000008' })
+function pcAbrirDocumento(o) {
+  const d = pcJanela();
+  const alvo = o.boleto
+    ? 'documento.html?boleto=' + encodeURIComponent(o.boleto)
+    : 'documento.html?comprovante=' + encodeURIComponent(o.comprovante);
+
+  document.getElementById('pc-janela-titulo').textContent =
+    o.boleto ? 'Boleto' : 'Comprovativo';
+
+  const corpo = document.getElementById('pc-janela-corpo');
+  corpo.classList.add('so-documento');
+  corpo.innerHTML =
+    `<iframe id="pc-janela-doc" src="${alvo}" title="Documento"
+             style="width:100%; height:min(70svh, 720px); border:0; display:block"></iframe>`;
+
+  document.getElementById('pc-janela-pe').innerHTML = `
+    <button type="button" class="secundario" id="pc-janela-cancelar">Fechar</button>
+    <button type="button" id="pc-janela-imprimir">
+      <span class="icone i-exportar"></span>Imprimir ou guardar PDF
+    </button>`;
+
+  document.getElementById('pc-janela-cancelar').onclick = () => d.close();
+  document.getElementById('pc-janela-imprimir').onclick = () => {
+    // imprimir o iframe, não a página: sai só a folha
+    const f = document.getElementById('pc-janela-doc');
+    if (f && f.contentWindow) { f.contentWindow.focus(); f.contentWindow.print(); }
+  };
+
+  d.showModal();
+}
+
+// Abre uma janela com conteúdo próprio (um formulário, por exemplo).
+// Devolve o <dialog>, para quem chama ligar os seus botões.
+function pcAbrirJanela(titulo, corpoHtml, peHtml) {
+  const d = pcJanela();
+  document.getElementById('pc-janela-titulo').textContent = titulo;
+  const corpo = document.getElementById('pc-janela-corpo');
+  corpo.classList.remove('so-documento');
+  corpo.innerHTML = corpoHtml;
+  document.getElementById('pc-janela-pe').innerHTML = peHtml || '';
+  d.showModal();
+  return d;
+}
+
 // O formulário de entrada é o mesmo nas sete páginas: mesmos ids, mesma
 // mensagem de erro, mesma coisa a seguir.
 function pcLigarEntrada(aoEntrar) {

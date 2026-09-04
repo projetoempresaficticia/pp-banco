@@ -59,9 +59,13 @@ escrever(
             <label for="descricao">Descrição</label>
             <input id="descricao" placeholder="Referência do pagamento" />
 
-            <button type="submit" id="btn-transferir">
-              <span class="icone i-transferir"></span>Transferir
-            </button>
+            <!-- o botão fica separado do último campo por uma linha e por
+                 espaço a sério: colado, parecia fazer parte da descrição -->
+            <div class="acoes-fim">
+              <button type="submit" id="btn-transferir">
+                <span class="icone i-transferir"></span>Transferir
+              </button>
+            </div>
             <p class="msg" id="msg-transferir"></p>
           </form>
 
@@ -107,10 +111,22 @@ escrever(
               Pague escrevendo a entidade e a referência, como num homebanking.
             </p>
           </div>
-          <a href="emitir.html" class="botao">
-            <span class="icone i-mais"></span>Emitir fatura
-          </a>
+          <div class="fila">
+            <a href="emitir.html" class="botao secundario">
+              <span class="icone i-cartao"></span>Emitir fatura
+            </a>
+            <button type="button" id="btn-emitir-boleto">
+              <span class="icone i-recibo"></span>Emitir boleto
+            </button>
+          </div>
         </div>
+
+        <p class="suave" style="font-size:13px; margin:-8px 0 var(--pc-e5)">
+          Uma <strong>fatura</strong> discrimina o que está a cobrar, item a
+          item, e gera o boleto. Um <strong>boleto</strong> é a ordem de
+          pagamento: entidade, referência, valor e prazo. Para cobrar uma taxa
+          ou um acerto não é preciso fatura nenhuma.
+        </p>
 
         <div class="painel">
           <div class="painel-cabeca"><h3>Pagar um boleto</h3></div>
@@ -235,9 +251,9 @@ escrever(
               <div class="selo-campo"><div class="rotulo">Referência</div><div class="valor" id="r-referencia">—</div></div>
             </div>
             <div class="fila" style="justify-content:center; margin-top:var(--pc-e5)">
-              <a id="r-boleto-link" class="botao" href="#" target="_blank" rel="noopener">
+              <button type="button" id="btn-ver-boleto">
                 <span class="icone i-exportar"></span>Ver e imprimir o boleto
-              </a>
+              </button>
               <a class="botao secundario" href="boletos.html">Ver boletos</a>
               <button type="button" class="secundario" id="btn-nova">Emitir outra</button>
             </div>

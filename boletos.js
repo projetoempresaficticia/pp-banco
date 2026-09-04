@@ -128,33 +128,59 @@ function desenhar() {
     return;
   }
 
-  alvo.innerHTML = lista.map((b) => `
-    <div class="movimento">
-      <div>
-        <div class="mov-categoria">
-          ${esc(b.descricao || 'Sem descrição')} ${badgeBoleto(b.estado, b.vencido)}
-        </div>
-        <div class="mov-detalhe">
-          ${souEmitente ? 'a cargo de' : 'de'} ${esc(b.contraparte)} ·
-          <span class="linha-mb">${esc(b.linha)}</span> ·
-          ${b.vencido ? '<span class="vencido">prazo ultrapassado</span>'
-                      : 'vence ' + formatarData(b.prazo)}
-        </div>
-      </div>
-      <div style="text-align:right">
-        <div class="mov-valor">${formatarP$(b.valor)}</div>
-        <div class="fila" style="justify-content:flex-end; margin-top:0.35rem">
-          <a class="codigo-auth" href="documento.html?boleto=${encodeURIComponent(b.entidade + '-' + b.referencia)}"
-             target="_blank" rel="noopener">boleto</a>
-          ${b.estado === 'pago'
-            ? `<a class="codigo-auth" href="documento.html?comprovante=${encodeURIComponent(b.fatura)}"
-                  target="_blank" rel="noopener">comprovativo</a>` : ''}
-          ${souEmitente && b.estado === 'por_pagar'
-            ? `<button type="button" class="perigo" style="margin:0;padding:0.25rem 0.7rem;font-size:0.78rem"
-                       data-cancelar="${esc(b.referencia)}">Cancelar</button>` : ''}
-        </div>
-      </div>
-    </div>`).join('');
+  alvo.innerHTML = `
+    <div class="rolavel">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Cobrança</th>
+            <th>${souEmitente ? 'A cargo de' : 'De'}</th>
+            <th>Referência</th>
+            <th>Prazo</th>
+            <th class="num">Valor</th>
+            <th class="num">Documentos</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lista.map((b) => `
+            <tr>
+              <td>
+                <div class="mov-categoria">${esc(b.descricao || 'Sem descrição')}</div>
+                <div class="mov-detalhe">
+                  ${b.avulso ? 'Boleto avulso' : 'Fatura ' + esc(b.fatura)}
+                  · ${badgeBoleto(b.estado, b.vencido)}
+                </div>
+              </td>
+              <td>${esc(b.contraparte)}</td>
+              <td><span class="linha-mb">${esc(b.linha)}</span></td>
+              <td>${b.vencido
+                    ? '<span class="vencido">prazo ultrapassado</span>'
+                    : formatarData(b.prazo)}</td>
+              <td class="num"><strong>${formatarP$(b.valor)}</strong></td>
+              <td class="num">
+                <div class="fila" style="justify-content:flex-end">
+                  <button type="button" class="fantasma"
+                          data-ver-boleto="${esc(b.entidade + '-' + b.referencia)}">Boleto</button>
+                  ${b.estado === 'pago'
+                    ? `<button type="button" class="fantasma"
+                               data-ver-comprovante="${esc(b.fatura)}">Comprovativo</button>` : ''}
+                  ${souEmitente && b.estado === 'por_pagar'
+                    ? `<button type="button" class="fantasma" style="color:var(--pc-erro)"
+                               data-cancelar="${esc(b.referencia)}">Cancelar</button>` : ''}
+                </div>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  // documentos numa janela por cima, sem sair da página
+  alvo.querySelectorAll('[data-ver-boleto]').forEach((btn) => {
+    btn.addEventListener('click', () => pcAbrirDocumento({ boleto: btn.dataset.verBoleto }));
+  });
+  alvo.querySelectorAll('[data-ver-comprovante]').forEach((btn) => {
+    btn.addEventListener('click', () => pcAbrirDocumento({ comprovante: btn.dataset.verComprovante }));
+  });
 
   alvo.querySelectorAll('[data-cancelar]').forEach((btn) => {
     btn.addEventListener('click', async () => {
@@ -162,11 +188,100 @@ function desenhar() {
       btn.disabled = true;
       const r = await api('banco_cancelar_boleto', { p_referencia: btn.dataset.cancelar });
       btn.disabled = false;
-      mostrarMsg(msgGeral, r.ok ? 'Boleto cancelado.' : r.erro, r.ok ? 'sucesso' : 'erro');
+      mostrarMsg(msgGeral, r.ok ? 'Boleto cancelado.' : r.erro, r.ok ? 'ok' : 'erro');
       if (r.ok) carregar();
     });
   });
 }
+
+/* ── emitir um boleto avulso ──────────────────────────────────────────
+   Fatura e boleto são coisas diferentes, e até agora só se podia criar
+   um boleto emitindo uma fatura com linhas. Uma taxa de P$ 15 não
+   precisa de discriminação nenhuma: precisa de quem paga, do que é, do
+   valor e do prazo.
+   ─────────────────────────────────────────────────────────────────── */
+
+async function abrirEmitirBoleto() {
+  const dir = await api('id_diretorio', { p_com_conta: true });
+  if (!dir.ok) { mostrarMsg(msgGeral, dir.erro, 'erro'); return; }
+
+  const minha = dados.cedula;
+  const opcoes = dir.dados
+    .filter((e) => e.cedula !== minha)
+    .map((e) => `<option value="${esc(e.cedula)}">${esc(e.nome)} · ${esc(e.cedula)}</option>`)
+    .join('');
+
+  if (!opcoes) {
+    mostrarMsg(msgGeral, 'Não há outras entidades com conta aberta para cobrar.', 'erro');
+    return;
+  }
+
+  const d = pcAbrirJanela('Emitir boleto',
+    `<p class="suave" style="margin-top:0">
+       Uma cobrança direta, sem fatura discriminada. Para cobrar item a
+       item, use <a href="emitir.html">Emitir fatura</a>.
+     </p>
+     <form id="form-boleto">
+       <label for="b-devedor">Quem tem de pagar</label>
+       <select id="b-devedor" required>${opcoes}</select>
+
+       <label for="b-descricao">Para que é a cobrança</label>
+       <input id="b-descricao" type="text" placeholder="Taxa de registo" required />
+
+       <div class="grade grade-2" style="margin-top:var(--pc-e4)">
+         <div>
+           <label for="b-valor" style="margin-top:0">Valor</label>
+           <input id="b-valor" inputmode="decimal" placeholder="0,00" required />
+           <p class="ajuda">Em P$, por exemplo 15,00.</p>
+         </div>
+         <div>
+           <label for="b-dias" style="margin-top:0">Prazo (dias)</label>
+           <input id="b-dias" type="number" min="1" max="365" value="30" />
+         </div>
+       </div>
+       <p class="msg" id="msg-boleto"></p>
+     </form>`,
+    `<button type="button" class="secundario" id="b-cancelar">Desistir</button>
+     <button type="button" id="b-emitir">
+       <span class="icone i-recibo"></span>Emitir boleto
+     </button>`);
+
+  document.getElementById('b-cancelar').onclick = () => d.close();
+
+  document.getElementById('b-emitir').onclick = async () => {
+    const msg = document.getElementById('msg-boleto');
+    const btn = document.getElementById('b-emitir');
+    const valor = paraCentimos(document.getElementById('b-valor').value);
+
+    if (!document.getElementById('b-descricao').value.trim()) {
+      mostrarMsg(msg, 'Escreva para que serve a cobrança.', 'erro'); return;
+    }
+    if (valor === null || valor <= 0) {
+      mostrarMsg(msg, 'Valor inválido. Use por exemplo 15,00.', 'erro'); return;
+    }
+
+    btn.disabled = true;
+    mostrarMsg(msg, 'A emitir…');
+    const r = await api('banco_emitir_boleto', {
+      p_devedor: document.getElementById('b-devedor').value,
+      p_descricao: document.getElementById('b-descricao').value.trim(),
+      p_valor: valor,
+      p_dias: parseInt(document.getElementById('b-dias').value, 10) || 30,
+    });
+    btn.disabled = false;
+
+    if (!r.ok) { mostrarMsg(msg, r.erro, 'erro'); return; }
+
+    d.close();
+    mostrarMsg(msgGeral,
+      `Boleto emitido. Entidade ${r.dados.entidade}, referência ${r.dados.referencia}.`, 'ok');
+    await carregar();
+    // mostrar logo o papel, que é o que se entrega a quem tem de pagar
+    pcAbrirDocumento({ boleto: r.dados.entidade + '-' + r.dados.referencia });
+  };
+}
+
+document.getElementById('btn-emitir-boleto').addEventListener('click', abrirEmitirBoleto);
 
 async function carregar() {
   const r = await api('banco_boletos', {});

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" />
-  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=2c4f04e7" />
+  <link rel="stylesheet" href="web/biblioteca/prepacoin.css?v=71f748f0" />
   <style>
     .linha-item {
       display: grid; grid-template-columns: 1fr 90px 150px 44px;
@@ -32,7 +32,7 @@
 <body>
 
   <!-- entrada: quem chega aqui sem sessão entra e fica nesta página -->
-  <div id="area-login" class="entrada">
+  <div id="area-login" class="ecra-entrada">
     <div class="entrada-caixa">
       <div class="entrada-marca" aria-hidden="true">P$</div>
       <h1>Prepacoin</h1>
@@ -109,9 +109,9 @@
               <div class="selo-campo"><div class="rotulo">Referência</div><div class="valor" id="r-referencia">—</div></div>
             </div>
             <div class="fila" style="justify-content:center; margin-top:var(--pc-e5)">
-              <a id="r-boleto-link" class="botao" href="#" target="_blank" rel="noopener">
+              <button type="button" id="btn-ver-boleto">
                 <span class="icone i-exportar"></span>Ver e imprimir o boleto
-              </a>
+              </button>
               <a class="botao secundario" href="boletos.html">Ver boletos</a>
               <button type="button" class="secundario" id="btn-nova">Emitir outra</button>
             </div>
@@ -133,7 +133,7 @@
   <script src="https://projetoempresaficticia.github.io/pp-base/web/comum.js"></script>
   <script src="web/comum-banco.js?v=833d295f"></script>
   <script src="web/tema.js?v=80d06e5f"></script>
-  <script src="web/parcial.js?v=f5f52630"></script>
-  <script src="emitir.js?v=9b423dfc"></script>
+  <script src="web/parcial.js?v=92dd8a3c"></script>
+  <script src="emitir.js?v=8fa408a5"></script>
 </body>
 </html>
