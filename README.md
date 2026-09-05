@@ -1,4 +1,4 @@
-# pp-banco
+# prepacoin
 
 Banco **Prepacoin** — contas, IBAN PT50, transferências em P$ (Prepara Portugal)
 
@@ -10,7 +10,13 @@ redesenhado sobre a biblioteca própria em 2026-09-04.
 **Depende de:** [pp-base](https://github.com/projetoempresaficticia/pp-base),
 [classcard](https://github.com/projetoempresaficticia/classcard) (pp-identidade)
 
-Site: https://projetoempresaficticia.github.io/pp-banco/
+Site: https://projetoempresaficticia.github.io/prepacoin/
+
+> O repositório chamava-se `pp-banco` e passou a `prepacoin` em
+> 2026-09-05, para bater certo com o nome do produto. O GitHub
+> redireciona o endereço antigo, mas os links dos outros repos já
+> apontam para o novo. A **skill** continua a chamar-se `pp-banco`,
+> porque segue a convenção `pp-*` das skills do ecossistema.
 
 Documentação completa (PRDs e decisões) em
 [prepara-portugal-docs](https://github.com/projetoempresaficticia/prepara-portugal-docs).
@@ -30,7 +36,7 @@ esteve (`#8F41DE`, `#FF7535`) já não é a do banco.
   explícita do utilizador vence as duas
 
 A biblioteca está em `web/biblioteca/prepacoin.css` e a montra em
-[biblioteca.html](https://projetoempresaficticia.github.io/pp-banco/biblioteca.html).
+[biblioteca.html](https://projetoempresaficticia.github.io/prepacoin/biblioteca.html).
 
 ### A marca
 
@@ -56,6 +62,39 @@ com o ícone do Cartório.
 No papel a marca vai a tinta e **sem** o chip: um quadrado de cor sólida
 gasta toner e, numa impressora a preto, sai como uma mancha cinzenta por
 cima da própria marca.
+
+### O fundo da entrada
+
+`ferramentas/gerar_fundo.py` prepara a arte a partir do original. **1408 KB
+em PNG passam a 37 KB em WebP**, com JPEG de 69 KB como reserva por
+`image-set`.
+
+A entrada é **sempre escura**, nos dois temas, como o rail. Não é
+esquecimento: a arte é escura com lima, e é essa a cara da marca. Um ecrã
+de entrada branco no tema claro e preto no escuro seriam dois produtos
+diferentes à porta.
+
+A arte tem o centro escuro e o lima nos cantos, por isso o cartão vai ao
+**centro** — ao contrário do Subsight, cuja arte deixa o campo livre à
+esquerda. É a composição da imagem que decide onde o conteúdo assenta.
+
+Em ecrã estreito entra uma versão recortada da faixa central, com 4 KB: a
+imagem larga seria reduzida ao ponto de as formas laterais desaparecerem,
+e pagava-se largura de banda por píxeis que ninguém vê.
+
+O cartão é vidro escuro sobre a arte, não a superfície branca do tema
+claro: um retângulo branco no meio desta imagem cortava-a ao meio.
+
+### A entrada cabe no ecrã
+
+Os espaçamentos acompanham a **altura da janela**, com `svh` (que já
+desconta as barras do browser) e `clamp()` a travar os extremos. Números
+fixos rebentam noutro ecrã: um portátil comum a 100% de zoom deixa ~600px
+úteis, e foi por isso que a entrada do Cartório e a do Subsight obrigavam
+a rolar.
+
+Há um piso de 560px de altura. Abaixo disso, apertar mais cortava o
+formulário, e aí vale mais deixar rolar.
 
 ### A regra que decide o resto
 

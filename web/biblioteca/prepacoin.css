@@ -662,25 +662,109 @@ select {
    extrato. Resultado: linhas de 570px numa tabela cujo conteúdo tinha
    40px. Duas regras diferentes a acertar no mesmo elemento, cada uma
    sem saber da outra. */
+/* A entrada é SEMPRE escura, nos dois temas, como o rail. Não é
+   esquecimento: a arte de fundo é escura com lima, e é essa a cara da
+   marca. Um ecrã de entrada branco no tema claro e preto no escuro
+   seriam dois produtos diferentes à porta.
+
+   A arte tem o centro escuro e o lima nos cantos, por isso o cartão vai
+   ao CENTRO — ao contrário do Subsight, cuja arte deixa o campo livre à
+   esquerda. A composição da imagem é que decide onde o conteúdo assenta. */
 .ecra-entrada {
   min-height: 100svh;
   display: grid;
   place-items: center;
   padding: var(--pc-e5);
-  background: var(--pc-chao-suave);
+  background-color: var(--pc-tinta);
+  background-image: image-set(
+    url("../marca/fundo-entrada.webp") type("image/webp"),
+    url("../marca/fundo-entrada.jpg") type("image/jpeg"));
+  background-image: -webkit-image-set(
+    url("../marca/fundo-entrada.webp") type("image/webp"),
+    url("../marca/fundo-entrada.jpg") type("image/jpeg"));
+  background-size: cover;
+  background-position: center;
+  color: #FFFFFF;
 }
+@media (max-width: 720px) {
+  /* num ecrã estreito a imagem larga seria reduzida ao ponto de as
+     formas laterais desaparecerem; esta traz só a faixa central */
+  .ecra-entrada {
+    background-image: url("../marca/fundo-entrada-movel.webp");
+  }
+}
+
 .entrada-caixa { width: 100%; max-width: 380px; }
 .entrada-marca {
   width: 60px; height: 60px;
   border-radius: var(--pc-r-painel);
   margin: 0 auto var(--pc-e4);
 }
-.entrada-caixa h1 { text-align: center; font-size: 24px; }
+.entrada-caixa h1 { text-align: center; font-size: 24px; color: #FFFFFF; }
 .entrada-caixa .sub {
-  text-align: center; color: var(--pc-texto-suave);
+  text-align: center;
+  color: rgba(255, 255, 255, .72);
   margin: var(--pc-e2) 0 var(--pc-e5);
 }
+
+/* O cartão é vidro escuro sobre a arte, e não a superfície branca do
+   tema claro: um retângulo branco no meio desta imagem cortava-a ao
+   meio. Os campos acompanham. */
+.ecra-entrada .painel {
+  background: rgba(18, 21, 28, .72);
+  border-color: rgba(255, 255, 255, .14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.ecra-entrada label { color: rgba(255, 255, 255, .88); }
+.ecra-entrada input {
+  background: rgba(255, 255, 255, .06);
+  border-color: rgba(255, 255, 255, .18);
+  color: #FFFFFF;
+}
+.ecra-entrada input::placeholder { color: rgba(255, 255, 255, .45); }
+.ecra-entrada input:hover { border-color: rgba(255, 255, 255, .34); }
+.ecra-entrada input:focus {
+  border-color: var(--pc-lima);
+  box-shadow: 0 0 0 3px rgba(235, 255, 120, .28);
+}
+.ecra-entrada .msg { color: rgba(255, 255, 255, .72); }
+/* o lima sobre o escuro dá 17,81:1, por isso aqui pode ser texto */
+.ecra-entrada .msg.erro { color: #FF7A70; }
+
 .entrada-caixa button[type="submit"] { width: 100%; margin-top: var(--pc-e5); }
+
+/* ═══ A ENTRADA CABE NO ECRÃ ════════════════════════════════════════
+   Os espaçamentos acompanham a ALTURA da janela, com `svh` (que já
+   desconta as barras do browser) e `clamp()` a travar os extremos.
+
+   Números fixos rebentam noutro ecrã: um portátil comum a 100% de zoom
+   deixa ~600px úteis, e foi por isso que a entrada do Cartório e a do
+   Subsight obrigavam a rolar. Assim encolhe com dignidade.
+
+   Há um piso de 560px de altura: abaixo disso, apertar mais cortava o
+   formulário, e aí vale mais deixar rolar. ═════════════════════════ */
+@media (min-height: 560px) {
+  .ecra-entrada { padding: clamp(12px, 3svh, 40px) var(--pc-e5); }
+  .entrada-marca {
+    width: clamp(40px, 7svh, 60px);
+    height: clamp(40px, 7svh, 60px);
+    margin-bottom: clamp(8px, 1.8svh, 16px);
+  }
+  .entrada-caixa h1 { font-size: clamp(18px, 3.2svh, 26px); }
+  .entrada-caixa .sub {
+    font-size: clamp(12px, 1.8svh, 14px);
+    margin: clamp(4px, 1svh, 8px) 0 clamp(12px, 3svh, 24px);
+  }
+  .ecra-entrada .painel { padding: clamp(16px, 3.4svh, 24px); }
+  .ecra-entrada label { margin: clamp(8px, 1.8svh, 16px) 0 clamp(4px, 1svh, 8px); }
+  .ecra-entrada label:first-child { margin-top: 0; }
+  .ecra-entrada input { min-height: clamp(38px, 6.6svh, 44px); }
+  .entrada-caixa button[type="submit"] {
+    min-height: clamp(38px, 6.6svh, 44px);
+    margin-top: clamp(14px, 3svh, 24px);
+  }
+}
 
 /* ───────────────────────────────────────────────────────────────────
    10. MOVIMENTOS
