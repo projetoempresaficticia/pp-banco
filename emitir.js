@@ -178,3 +178,60 @@ async function verificarSessao() {
 
 pcLigarEntrada(verificarSessao);
 verificarSessao();
+
+// ── SAF-T ────────────────────────────────────────────────────────────
+//
+// O ficheiro nasce no servidor (banco_saft) e não aqui: os dados têm de vir
+// da fonte de verdade, e a AT vai recalcular os mesmos totais a partir das
+// faturas que ela própria vê. Se o browser montasse o XML, declarar seria
+// uma questão de escrever o que apetecesse.
+
+const campoSaft = document.getElementById('saft-competencia');
+const msgSaft = document.getElementById('msg-saft');
+const resumoSaft = document.getElementById('saft-resumo');
+const btnSaft = document.getElementById('btn-saft');
+
+if (campoSaft) {
+  const hoje = new Date();
+  campoSaft.value = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+}
+
+if (btnSaft) {
+  btnSaft.addEventListener('click', async () => {
+    resumoSaft.hidden = true;
+    if (!campoSaft.value) {
+      mostrarMsg(msgSaft, 'Escolha o mês a exportar.', 'erro');
+      return;
+    }
+
+    btnSaft.disabled = true;
+    mostrarMsg(msgSaft, 'A montar o ficheiro…');
+    const r = await api('banco_saft', { p_competencia: campoSaft.value });
+    btnSaft.disabled = false;
+
+    if (!r.ok) {
+      mostrarMsg(msgSaft, r.erro, 'erro');
+      return;
+    }
+    const d = r.dados;
+    if (d.faturas === 0) {
+      mostrarMsg(msgSaft, 'Não emitiu faturas nesse mês — não há nada a declarar.', 'erro');
+      return;
+    }
+
+    const url = URL.createObjectURL(new Blob([d.xml], { type: 'application/xml' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = d.ficheiro;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    resumoSaft.textContent =
+      d.faturas + ' fatura(s) · base ' + formatarP$(d.liquido)
+      + ' · IVA ' + formatarP$(d.imposto) + ' · total ' + formatarP$(d.bruto);
+    resumoSaft.hidden = false;
+    mostrarMsg(msgSaft, d.ficheiro + ' descarregado. Entregue-o na AT, em e-Fatura.', 'ok');
+  });
+}

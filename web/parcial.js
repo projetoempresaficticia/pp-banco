@@ -37,12 +37,7 @@ function pcMontarRail(alvo) {
          ${p.href === atual ? 'aria-current="page"' : ''}>
         <span class="icone icone-24 ${p.icone}"></span>
         <span class="so-leitores">${pcEscapar(p.nome)}</span>
-      </a>`).join('') + `
-      <a href="biblioteca.html" class="empurra" title="Biblioteca"
-         ${atual === 'biblioteca.html' ? 'aria-current="page"' : ''}>
-        <span class="icone icone-24 i-categorias"></span>
-        <span class="so-leitores">Biblioteca</span>
-      </a>`;
+      </a>`).join('');
 }
 
 function pcMontarBarra(alvo, titulo) {
