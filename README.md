@@ -13,10 +13,16 @@ redesenhado sobre a biblioteca própria em 2026-09-04.
 Site: https://projetoempresaficticia.github.io/prepacoin/
 
 > O repositório chamava-se `pp-banco` e passou a `prepacoin` em
-> 2026-09-05, para bater certo com o nome do produto. O GitHub
-> redireciona o endereço antigo, mas os links dos outros repos já
-> apontam para o novo. A **skill** continua a chamar-se `pp-banco`,
-> porque segue a convenção `pp-*` das skills do ecossistema.
+> 2026-09-05, para bater certo com o nome do produto.
+>
+> **Atenção ao endereço antigo.** O GitHub redireciona o repositório
+> (`github.com/.../pp-banco` → `.../prepacoin`), mas **não redireciona o
+> GitHub Pages**: `projetoempresaficticia.github.io/pp-banco/` passou a
+> dar **404**. Quem tiver esse endereço nos favoritos tem de o trocar.
+> Os links dos outros repos já foram atualizados.
+>
+> A **skill** continua a chamar-se `pp-banco`, porque segue a convenção
+> `pp-*` das skills do ecossistema.
 
 Documentação completa (PRDs e decisões) em
 [prepara-portugal-docs](https://github.com/projetoempresaficticia/prepara-portugal-docs).
